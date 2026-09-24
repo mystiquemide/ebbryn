@@ -47,7 +47,7 @@ export function BuiltOn() {
                 </div>
                 <p className="text-[16px] leading-[24px] text-charcoal">{s.body}</p>
                 <span className="mt-auto text-[14px] text-ink underline-offset-4 group-hover:underline">
-                  {s.href.replace("https://www.", "")} ↗
+                  {s.href.replace("https://www.", "")}
                 </span>
               </a>
             </li>

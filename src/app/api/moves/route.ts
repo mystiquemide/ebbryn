@@ -13,6 +13,9 @@ export type Move = {
   network: string;
   chainId: number;
   explorerUrl: string;
+  vaultAddress: `0x${string}`;
+  asset: `0x${string}`;
+  decimals: number;
   amount: number;
   baseUnits: string;
   steps: McpStep[];
@@ -57,7 +60,19 @@ export async function POST(req: Request) {
       if (steps.some((s) => !allowed.has(s.tx.to.toLowerCase()))) {
         return bad(502, `IXS returned a transaction for an unexpected contract on ${v.name}. Nothing to sign.`);
       }
-      moves.push({ vaultId: v.id, vaultName: v.name, network: v.network, chainId: v.chainId, explorerUrl: v.explorerUrl, amount: p.amount, baseUnits, steps });
+      moves.push({
+        vaultId: v.id,
+        vaultName: v.name,
+        network: v.network,
+        chainId: v.chainId,
+        explorerUrl: v.explorerUrl,
+        vaultAddress: v.address,
+        asset: v.asset,
+        decimals: v.decimals,
+        amount: p.amount,
+        baseUnits,
+        steps,
+      });
     }
     return Response.json({ moves });
   } catch (e) {

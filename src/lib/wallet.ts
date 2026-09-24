@@ -1,6 +1,6 @@
 "use client";
 
-import { createPublicClient, erc20Abi, formatUnits, http, type EIP1193Provider } from "viem";
+import { createPublicClient, createWalletClient, custom, erc20Abi, formatUnits, http, type EIP1193Provider } from "viem";
 import { chainById } from "./chains";
 
 declare global {
@@ -35,4 +35,69 @@ export async function readTokenBalance(chainId: number, token: `0x${string}`, ow
   const client = createPublicClient({ chain, transport: http() });
   const raw = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [owner] });
   return Number(formatUnits(raw, decimals));
+}
+
+export async function walletChainId(): Promise<number> {
+  if (!window.ethereum) throw new WalletError("No browser wallet found.");
+  const hex = (await window.ethereum.request({ method: "eth_chainId" })) as string;
+  return parseInt(hex, 16);
+}
+
+// Switches the wallet to the chain, adding it first if the wallet doesn't know it.
+export async function switchWalletChain(chainId: number): Promise<void> {
+  const chain = chainById(chainId);
+  if (!window.ethereum || !chain) throw new WalletError("Can't switch networks in this wallet.");
+  const hexId = `0x${chainId.toString(16)}` as `0x${string}`;
+  try {
+    await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hexId }] });
+  } catch (e) {
+    const code = (e as { code?: number })?.code;
+    if (code === 4001) throw new WalletError("You declined the network switch.");
+    if (code !== 4902) throw new WalletError("The wallet couldn't switch networks.");
+    await window.ethereum.request({
+      method: "wallet_addEthereumChain",
+      params: [
+        {
+          chainId: hexId,
+          chainName: chain.name,
+          nativeCurrency: chain.nativeCurrency,
+          rpcUrls: [...chain.rpcUrls.default.http],
+          blockExplorerUrls: chain.blockExplorers ? [chain.blockExplorers.default.url] : [],
+        },
+      ],
+    });
+  }
+}
+
+export async function readAllowance(chainId: number, token: `0x${string}`, owner: `0x${string}`, spender: `0x${string}`): Promise<bigint> {
+  const chain = chainById(chainId);
+  if (!chain) throw new WalletError(`Ebbryn doesn't know chain ${chainId}.`);
+  const client = createPublicClient({ chain, transport: http() });
+  return client.readContract({ address: token, abi: erc20Abi, functionName: "allowance", args: [owner, spender] });
+}
+
+export type TxOutcome = { hash: `0x${string}`; status: "success" | "reverted" };
+
+// Sends one prepared transaction from the user's wallet and waits for it on chain.
+export async function sendAndConfirm(
+  chainId: number,
+  from: `0x${string}`,
+  tx: { to: `0x${string}`; data: `0x${string}`; value?: string },
+  onSent: (hash: `0x${string}`) => void,
+): Promise<TxOutcome> {
+  const chain = chainById(chainId);
+  if (!window.ethereum || !chain) throw new WalletError("No browser wallet found.");
+  const wallet = createWalletClient({ chain, transport: custom(window.ethereum) });
+  let hash: `0x${string}`;
+  try {
+    hash = await wallet.sendTransaction({ account: from, to: tx.to, data: tx.data, value: tx.value ? BigInt(tx.value) : BigInt(0), chain });
+  } catch (e) {
+    const code = (e as { code?: number; cause?: { code?: number } })?.code ?? (e as { cause?: { code?: number } })?.cause?.code;
+    if (code === 4001 || /rejected|denied/i.test(String((e as Error)?.message))) throw new WalletError("Not signed. Nothing moved.");
+    throw new WalletError("The wallet couldn't send this transaction. Nothing moved.");
+  }
+  onSent(hash);
+  const client = createPublicClient({ chain, transport: http() });
+  const receipt = await client.waitForTransactionReceipt({ hash, timeout: 180_000 });
+  return { hash, status: receipt.status };
 }
