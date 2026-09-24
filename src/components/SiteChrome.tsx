@@ -2,17 +2,6 @@ import Link from "next/link";
 import { REPO_URL } from "@/lib/site";
 import { Wordmark } from "./TideMark";
 
-export function AnnouncementStrip() {
-  return (
-    <div className="bg-lime-notice px-4 py-2 text-center text-[14px] leading-[21px] text-ink/80">
-      Running on IXS testnet vaults. Mainnet access requires IXS verification.{" "}
-      <Link href="/#how" className="whitespace-nowrap text-ink underline-offset-4 hover:underline">
-        How it works →
-      </Link>
-    </div>
-  );
-}
-
 export function SiteFooter() {
   return (
     <footer className="mt-auto border-t border-steel bg-paper">
