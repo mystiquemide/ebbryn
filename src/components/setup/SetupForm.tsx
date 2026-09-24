@@ -356,7 +356,7 @@ export function SetupForm() {
 
         <div className="hidden flex-col gap-3 border-t border-steel pt-8 sm:flex-row sm:items-center sm:justify-between lg:flex">
           <p className="text-[14px] text-slate">
-            {leaving ? "SERV is evaluating your payouts and rules. Usually 40 to 70 seconds." : canPlan ? "SERV plans usually take 40 to 70 seconds." : "Add a balance and at least one payout to plan."}
+            {leaving ? "SERV is evaluating your payouts and rules. Usually under 2 minutes." : canPlan ? "SERV plans usually take under 2 minutes." : "Add a balance and at least one payout to plan."}
           </p>
           <div className="sm:w-[240px]">{cta("")}</div>
         </div>
@@ -404,7 +404,7 @@ export function SetupForm() {
           {!canPlan && <p className="mt-3 text-[13px] text-white/55">Add a balance and at least one payout to plan.</p>}
           {canPlan && (
             <p className="mt-3 text-[13px] text-white/55 lg:hidden">
-              {leaving ? "SERV is evaluating your payouts and rules. Usually 40 to 70 seconds." : "SERV plans usually take 40 to 70 seconds."}
+              {leaving ? "SERV is evaluating your payouts and rules. Usually under 2 minutes." : "SERV plans usually take under 2 minutes."}
             </p>
           )}
           {error && <p className="mt-3 rounded-[12px] p-3 text-[13px] text-paper" style={{ background: "rgba(179,38,30,0.35)" }}>{error}</p>}

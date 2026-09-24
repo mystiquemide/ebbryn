@@ -70,7 +70,7 @@ function Planning({ started }: { started: number }) {
         <span className="num text-ink" aria-live="off">
           {Math.floor(s / 60)}:{String(s % 60).padStart(2, "0")}
         </span>{" "}
-        elapsed. SERV is weighing your payouts and rules, then Ebbryn runs its 8 checks. Usually 40 to 70 seconds.
+        elapsed. SERV is weighing your payouts and rules, then Ebbryn runs its 8 checks. Usually under 2 minutes.
       </p>
     </div>
   );

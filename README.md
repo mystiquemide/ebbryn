@@ -1,14 +1,10 @@
 # Ebbryn
 
-Cash that comes back on time.
+Cash that comes back on time. Ebbryn parks the USDC you hold for payroll in IXS vaults and brings it back before payday. SERV plans it, code checks it, and you sign it.
 
-Businesses that hold USDC for payroll keep weeks of it sitting idle, and USDC earns nothing on its own. Parking it somewhere that pays is easy. Getting it back before payday, every time, is the part nobody wants to trust to a guess. Ebbryn plans that, checks the plan in code, and leaves every transaction for you to sign.
+Live: https://ebbryn.vercel.app (BSC testnet)
 
-There is no personal payroll receipt behind this project. The proof below is what Ebbryn actually did with real SERV and IXS calls on Sep 24, 2026.
-
-## One line
-
-Not a yield dashboard, not an auto-investing bot, and not an AI that moves money: a planner where a model proposes, deterministic code decides whether the plan is allowed, and nothing reaches a wallet without your signature.
+In testing, SERV kept 8,000 USDC ready for payroll and also scheduled an 8,000 USDC withdrawal for the same payroll. Ebbryn's checks caught it and nothing moved. That is the design: the model proposes, deterministic code decides whether the plan is allowed, and nothing reaches a wallet without your signature.
 
 ## How it works
 
@@ -31,7 +27,7 @@ IXS builds the transactions, and you approve and deposit from your own wallet.
 Live at https://ebbryn.vercel.app (testnet). Planning uses shared SERV credits and is rate limited. Open it, or run it yourself (see the last section), then:
 
 1. Open `/` and scroll to "Why code checks the model". It runs the real checks against a recorded SERV plan that counted payroll twice.
-2. Click **Plan my cash**, keep the Payroll team template, click **Plan my cash** again. A live SERV plan comes back in about 25 to 70 seconds with a tide chart, SERV's reasons and 8 check tiles.
+2. Click **Plan my cash**, keep the Payroll team template, click **Plan my cash** again. A live SERV plan comes back in about 40 seconds to 2 minutes with a tide chart, SERV's reasons and 8 check tiles.
 3. Edit a rule, for example "keep at least half the balance ready", and plan again. The reasons quote the rule you changed.
 4. Click **View a plan Ebbryn rejected** to see the recorded failure with moves locked.
 5. Click **Review moves**, connect a browser wallet on BSC testnet, and see the exact approve and deposit Ebbryn would ask you to sign, with balance, gas and network checks.
@@ -42,9 +38,10 @@ Live at https://ebbryn.vercel.app (testnet). Planning uses shared SERV credits a
 |---|---|---|
 | SERV counts the same payroll twice | Rejected by `COVER_ONCE` and `LIQUID_COVER`, 2 failed and 6 passed, nothing signable | [`src/fixtures/serv-double-count.json`](src/fixtures/serv-double-count.json), [`check.test.ts`](src/lib/check.test.ts) |
 | SERV plan that should pass | 8 of 8 checks, 81,600 ready, 46,800 parked, 42,000 withdrawn Oct 14 for the Oct 15 payroll | SERV request `0520d265-1c98-4539-98f3-d0cf7f4d3173`, [`src/fixtures/serv-plan-payroll.json`](src/fixtures/serv-plan-payroll.json) |
+| Same plan on the live URL | 8 of 8 checks on the first attempt, signed | SERV request `4e20751a-7866-4b12-ac69-4fa3eec5aca8` |
 | Rules text says "park 100%" | `CAP` fails, hard limits win over the rules | [`check.test.ts`](src/lib/check.test.ts) |
 | Plan edited in the browser before signing | `/api/moves` returns 400, no transactions built | [`guard.test.ts`](src/lib/guard.test.ts), [`src/app/api/moves/route.ts`](src/app/api/moves/route.ts) |
-| Planning spammed from one IP | 429 after 5 plans in 10 minutes, daily cap 200 | [`guard.test.ts`](src/lib/guard.test.ts) |
+| Planning spammed from one IP | 429 after 5 plans in 10 minutes, daily cap 200, counted in Redis across server instances | [`guard.test.ts`](src/lib/guard.test.ts), [`ratelimit.ts`](src/lib/ratelimit.ts) |
 | Amount conversion | 75,600 USDC becomes `75600000000` base units, no float error | [`units.test.ts`](src/lib/units.test.ts) |
 | Tide chart honesty | Wallet never negative, ready + parked + paid always equals the balance | [`timeline.test.ts`](src/lib/timeline.test.ts) |
 | IXS approve amount | Decoded from the real IXS `approve` call and matched to the deposit before the UI says "exactly" | [`src/lib/wallet.ts`](src/lib/wallet.ts) `decodeApprove` |
@@ -71,19 +68,23 @@ Things found and reported to IXS while building, in [IXS-Finance/ixs-rwa-agent-s
 | Agent wallets with threshold sweeping | Move balance above a threshold | Ebbryn reasons over dates and rules, and code checks every plan |
 | "AI treasury" agents | A model decides and executes | The model only proposes. Code gates it and you sign every transaction |
 
+## Business model
+
+Ebbryn keeps 15% of the yield it earns for a customer and charges nothing when it earns nothing. 500,000 USDC parked at 6% earns 30,000 USDC a year, and Ebbryn keeps 4,500. A second line is a referral share from IXS for new vault deposits. There is no billing in this build.
+
 ## Honest limitations
 
 - Unaudited hackathon code. Testnet only. Don't use it with real funds.
-- No deposit has been signed on chain yet. The IXS test USDC can only be minted by IXS, and the request is open in issue #5. The approve and deposit are built by IXS and checked, but not broadcast.
-- Withdrawals are planned, not automated. On the withdrawal date you come back and sign it. There are no reminders yet.
-- SERV plans take 25 to 70 seconds. Identical inputs within 10 minutes reuse the last plan.
+- Awaiting sponsor test funds. The IXS test USDC can only be minted by IXS, and the request is open in issue #5. The approve and deposit are built by IXS and checked, but not broadcast yet.
+- Withdrawals are planned, not automated. On the withdrawal date you come back and sign it. Each withdrawal has an "Add to calendar" reminder.
+- SERV plans take about 40 seconds to 2 minutes. Identical inputs within 10 minutes reuse the last plan.
 - Mainnet IXS vaults require IXS verification (KYC). Only testnet vaults are used here.
-- Rate limits and the plan cache are in memory and reset when the server restarts.
+- The plan cache is in memory and resets when the server restarts.
 - Your setup and plans live in your browser's local storage. There are no accounts.
 
 ## What's real
 
-The SERV and IXS calls are real and there is no mock data in the app. The only recorded data is the SERV plan that failed its checks and one that passed, both labelled as recorded wherever they appear, plus a committed snapshot of the IXS vault list shown only when IXS is unreachable, with its timestamp. The model proposes, and the eight checks in [`src/lib/check.ts`](src/lib/check.ts) decide. 36 tests pass with `npm test`.
+The SERV and IXS calls are real and there is no mock data in the app. The only recorded data is the SERV plan that failed its checks and one that passed, both labelled as recorded wherever they appear, plus a committed snapshot of the IXS vault list shown only when IXS is unreachable, with its timestamp. The model proposes, and the eight checks in [`src/lib/check.ts`](src/lib/check.ts) decide. 37 tests pass with `npm test`.
 
 ## Run locally
 
