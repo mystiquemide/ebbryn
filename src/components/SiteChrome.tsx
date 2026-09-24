@@ -14,7 +14,6 @@ export function SiteFooter() {
           <p className="label">Product</p>
           <Link href="/#how" className="text-charcoal hover:text-ink">How it works</Link>
           <Link href="/#vaults" className="text-charcoal hover:text-ink">Vaults</Link>
-          <Link href="/#pricing" className="text-charcoal hover:text-ink">Pricing</Link>
         </div>
         <div className="flex flex-col gap-3">
           <p className="label label-dev">Built on</p>

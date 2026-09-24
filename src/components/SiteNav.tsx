@@ -8,7 +8,6 @@ import { Wordmark } from "./TideMark";
 const LANDING_LINKS = [
   { href: "/#how", label: "How it works" },
   { href: "/#vaults", label: "Vaults" },
-  { href: "/#pricing", label: "Pricing" },
 ];
 
 const STEPS = [
