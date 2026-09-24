@@ -3,6 +3,7 @@ import { SiteNav } from "@/components/SiteNav";
 import { Hero } from "@/components/landing/Hero";
 import { IdleCash } from "@/components/landing/IdleCash";
 import { CaughtMistake } from "@/components/landing/CaughtMistake";
+import { HowItWorks } from "@/components/landing/HowItWorks";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,7 @@ export default function Home() {
         <Hero />
         <IdleCash />
         <CaughtMistake />
+        <HowItWorks />
       </main>
       <SiteFooter />
     </>
