@@ -83,13 +83,10 @@ function toSheets(vaults: VaultInfo[]): Sheet[] {
 }
 
 export async function HeroVaults() {
-  try {
-    const vaults = await listVaults();
-    if (vaults.length === 0) return <Stack sheets={[]} status="IXS lists no testnet vaults right now" />;
-    return <Stack sheets={toSheets(vaults)} status="Live from IXS testnet" />;
-  } catch {
-    return <Stack sheets={[]} status="IXS is not answering right now" />;
-  }
+  const vaults = await listVaults().catch(() => null);
+  if (vaults === null) return <Stack sheets={[]} status="IXS is not answering right now" />;
+  if (vaults.length === 0) return <Stack sheets={[]} status="IXS lists no testnet vaults right now" />;
+  return <Stack sheets={toSheets(vaults)} status="Live from IXS testnet" />;
 }
 
 export function HeroVaultsLoading() {
