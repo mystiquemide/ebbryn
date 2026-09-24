@@ -5,6 +5,9 @@ import type { Occurrence, Payout } from "./schedule";
 export const SERV_BASE_URL = "https://inference-api.openserv.ai/v1";
 export const SERV_MODEL = process.env.SERV_MODEL ?? "gpt-6-luna-serv-kronos-multipath";
 
+// Each Shadow Agent attempt is a judge call plus a possible revision, so it drives most of the plan latency.
+const SHADOW_ITERATIONS = Number(process.env.SERV_SHADOW_ITERATIONS ?? 2);
+
 const SHADOW_HINT =
   "Liquid plus parked must equal the balance. Every payout occurrence must be funded exactly once, by liquidFunds or by one redemption, never both. Never park in a vault whose acceptsDeposits is false.";
 
@@ -106,10 +109,10 @@ function userMessage(req: PlanRequest, failures?: CheckFailure[]): string {
   return lines.join("\n");
 }
 
-export async function requestPlan(req: PlanRequest, failures?: CheckFailure[]): Promise<{ plan: Plan; meta: ServMeta }> {
+export async function requestPlan(req: PlanRequest, failures?: CheckFailure[], signal?: AbortSignal): Promise<{ plan: Plan; meta: ServMeta }> {
   const apiKey = process.env.SERV_API_KEY;
   if (!apiKey) throw new ServError("SERV_API_KEY is not set");
-  const client = new OpenAI({ apiKey, baseURL: SERV_BASE_URL, timeout: 170_000, maxRetries: 0 });
+  const client = new OpenAI({ apiKey, baseURL: SERV_BASE_URL, timeout: 120_000, maxRetries: 0 });
 
   const started = Date.now();
   const call = client.chat.completions
@@ -131,19 +134,20 @@ export async function requestPlan(req: PlanRequest, failures?: CheckFailure[]): 
               type: "object",
               properties: {
                 hint: { type: "string", default: SHADOW_HINT },
-                max_iterations: { type: "integer", default: 2 },
+                max_iterations: { type: "integer", default: SHADOW_ITERATIONS },
               },
             },
           },
         },
       ],
-    })
+    }, { signal })
     .withResponse();
   let data: Awaited<typeof call>["data"];
   let response: Response;
   try {
     ({ data, response } = await call);
   } catch (e) {
+    if (e instanceof OpenAI.APIUserAbortError) throw new ServError("SERV request cancelled");
     if (e instanceof OpenAI.APIConnectionTimeoutError) throw new ServError("SERV took too long to plan. Try again.");
     if (e instanceof OpenAI.APIError && e.status === 402) throw new ServError("SERV credit balance too low");
     if (e instanceof OpenAI.APIError) throw new ServError(`SERV returned HTTP ${e.status}`);
@@ -173,4 +177,46 @@ export async function requestPlan(req: PlanRequest, failures?: CheckFailure[]): 
       tokens: data.usage?.total_tokens ?? null,
     },
   };
+}
+
+// SERV's median plan is about 35s, but some requests stall past 100s. If the first request hasn't
+// answered by HEDGE_MS, send the same request again and keep whichever finishes first.
+const HEDGE_MS = Number(process.env.SERV_HEDGE_MS ?? 45_000);
+
+export async function requestPlanHedged(req: PlanRequest, failures?: CheckFailure[]): Promise<{ plan: Plan; meta: ServMeta }> {
+  const first = new AbortController();
+  const second = new AbortController();
+  let settled = false;
+  let hedged = false;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let failSecond: (e: unknown) => void = () => undefined;
+
+  const a = requestPlan(req, failures, first.signal);
+  const b = new Promise<{ plan: Plan; meta: ServMeta }>((resolve, reject) => {
+    failSecond = reject;
+    timer = setTimeout(() => {
+      if (settled) return reject(new ServError("hedge not needed"));
+      hedged = true;
+      console.info("serv plan hedged");
+      requestPlan(req, failures, second.signal).then(resolve, reject);
+    }, HEDGE_MS);
+  });
+  // If the first request fails before the hedge starts (a 402, a bad schema), fail now instead of waiting.
+  a.catch((e) => {
+    if (hedged) return;
+    clearTimeout(timer);
+    failSecond(e);
+  });
+
+  try {
+    return await Promise.any([a, b]);
+  } catch (e) {
+    const errors = e instanceof AggregateError ? e.errors : [e];
+    throw errors.find((x) => !(x instanceof ServError && /cancelled|not needed/.test(x.message))) ?? errors[0];
+  } finally {
+    settled = true;
+    clearTimeout(timer);
+    first.abort();
+    second.abort();
+  }
 }

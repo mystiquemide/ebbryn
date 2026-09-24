@@ -4,7 +4,7 @@ import { IxsError, listVaults } from "@/lib/ixs";
 import type { CheckResult, Plan, VaultInfo } from "@/lib/plan";
 import { cacheGet, cacheSet, takeSharedPlanSlot } from "@/lib/ratelimit";
 import { expandSchedule } from "@/lib/schedule";
-import { requestPlan, ServError, type ServMeta } from "@/lib/serv";
+import { requestPlanHedged, ServError, type ServMeta } from "@/lib/serv";
 import { canonical, signPayload } from "@/lib/sign";
 
 export const maxDuration = 300;
@@ -50,11 +50,13 @@ export async function POST(req: Request) {
     const request = { ...inputs, occurrences, vaults };
     const run = (plan: Plan) => checkPlan({ plan, ...inputs, occurrences, vaults });
 
-    let { plan, meta } = await requestPlan(request);
+    const started = Date.now();
+    let { plan, meta } = await requestPlanHedged(request);
     let check = run(plan);
     let attempts = 1;
-    if (!check.ok) {
-      const retry = await requestPlan(request, check.failures);
+    // Retry once with the failures, but only if there's time left inside the function limit.
+    if (!check.ok && Date.now() - started < 120_000) {
+      const retry = await requestPlanHedged(request, check.failures);
       plan = retry.plan;
       meta = retry.meta;
       check = run(plan);
