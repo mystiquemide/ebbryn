@@ -5,11 +5,11 @@ type Photo = { src: string; alt: string; author: string; authorUrl: string; phot
 const UTM = "utm_source=ebbryn&utm_medium=referral";
 
 const PAYROLL: Photo = {
-  src: "https://images.unsplash.com/photo-1664575600796-ffa828c5cb6e",
-  alt: "A man working at a laptop at a wooden desk by a bright window",
-  author: "Microsoft 365",
-  authorUrl: "https://unsplash.com/@microsoft365",
-  photoUrl: "https://unsplash.com/photos/a-man-sitting-at-a-table-in-front-of-a-laptop-TLiWhlDEJwA",
+  src: "https://images.unsplash.com/photo-1448932223592-d1fc686e76ea",
+  alt: "A man working on a laptop at a wooden table by a window",
+  author: "Bench Accounting",
+  authorUrl: "https://unsplash.com/@benchaccounting",
+  photoUrl: "https://unsplash.com/photos/man-operating-laptop-on-top-of-table-C3V88BOoRoM",
 };
 
 const AGENTS: Photo = {
