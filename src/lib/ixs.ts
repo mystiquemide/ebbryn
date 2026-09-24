@@ -5,6 +5,7 @@ const MCP_URL = process.env.IXS_MCP_URL ?? "https://api-dev-v2.ixs.finance/mcp";
 const API_BASE = MCP_URL.replace(/\/mcp$/, "");
 const ASYNC_LAG_DAYS = Number(process.env.IXS_ASYNC_LAG_DAYS ?? 2);
 // Address used only to ask IXS whether a vault accepts deposits right now. It never signs anything.
+const TIMEOUT_MS = Number(process.env.IXS_TIMEOUT_MS ?? 8000);
 const PROBE_OWNER = "0x000000000000000000000000000000000000dEaD";
 
 export class IxsError extends Error {}
@@ -36,6 +37,9 @@ export async function mcpCall<T>(name: string, args: Record<string, unknown>): P
     headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
     body: JSON.stringify({ jsonrpc: "2.0", id: Date.now(), method: "tools/call", params: { name, arguments: args } }),
     cache: "no-store",
+    signal: AbortSignal.timeout(TIMEOUT_MS),
+  }).catch((e) => {
+    throw new IxsError(e?.name === "TimeoutError" ? `IXS MCP ${name} timed out` : `IXS MCP ${name} could not be reached`);
   });
   if (!res.ok) throw new IxsError(`IXS MCP ${name} failed with HTTP ${res.status}`);
   return parseSse(await res.text()) as T;
@@ -89,7 +93,9 @@ const CACHE_MS = 60_000;
 // Live IXS testnet vaults with settlement type and whether each accepts deposits right now.
 export async function listVaults(): Promise<VaultInfo[]> {
   if (cache && Date.now() - cache.at < CACHE_MS) return cache.vaults;
-  const res = await fetch(`${API_BASE}/vaults?pageSize=100`, { cache: "no-store" });
+  const res = await fetch(`${API_BASE}/vaults?pageSize=100`, { cache: "no-store", signal: AbortSignal.timeout(TIMEOUT_MS) }).catch(() => {
+    throw new IxsError("IXS vault list could not be reached");
+  });
   if (!res.ok) throw new IxsError(`IXS vault list failed with HTTP ${res.status}`);
   const list = (await res.json()) as { items?: RawVault[] };
   const items = (list.items ?? []).filter((v) => (v.status ?? "active") === "active" && /testnet/.test(v.network));
