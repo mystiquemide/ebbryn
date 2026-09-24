@@ -109,7 +109,7 @@ function userMessage(req: PlanRequest, failures?: CheckFailure[]): string {
 export async function requestPlan(req: PlanRequest, failures?: CheckFailure[]): Promise<{ plan: Plan; meta: ServMeta }> {
   const apiKey = process.env.SERV_API_KEY;
   if (!apiKey) throw new ServError("SERV_API_KEY is not set");
-  const client = new OpenAI({ apiKey, baseURL: SERV_BASE_URL, timeout: 120_000, maxRetries: 0 });
+  const client = new OpenAI({ apiKey, baseURL: SERV_BASE_URL, timeout: 170_000, maxRetries: 0 });
 
   const started = Date.now();
   const call = client.chat.completions

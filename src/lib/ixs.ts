@@ -6,7 +6,7 @@ const MCP_URL = process.env.IXS_MCP_URL ?? "https://api-dev-v2.ixs.finance/mcp";
 const API_BASE = MCP_URL.replace(/\/mcp$/, "");
 const ASYNC_LAG_DAYS = Number(process.env.IXS_ASYNC_LAG_DAYS ?? 2);
 // Address used only to ask IXS whether a vault accepts deposits right now. It never signs anything.
-const TIMEOUT_MS = Number(process.env.IXS_TIMEOUT_MS ?? 8000);
+const TIMEOUT_MS = Number(process.env.IXS_TIMEOUT_MS ?? 12000);
 const PROBE_OWNER = "0x000000000000000000000000000000000000dEaD";
 
 export class IxsError extends Error {}
@@ -36,7 +36,13 @@ export function parseSse(body: string): unknown {
 let queue: Promise<unknown> = Promise.resolve();
 
 export function mcpCall<T>(name: string, args: Record<string, unknown>): Promise<T> {
-  const run = queue.then(() => mcpCallNow<T>(name, args));
+  // One retry on timeout or network failure: IXS is slower from some regions.
+  const attempt = () =>
+    mcpCallNow<T>(name, args).catch((e) => {
+      if (e instanceof IxsError && /timed out|could not be reached/.test(e.message)) return mcpCallNow<T>(name, args);
+      throw e;
+    });
+  const run = queue.then(attempt);
   queue = run.catch(() => undefined);
   return run;
 }

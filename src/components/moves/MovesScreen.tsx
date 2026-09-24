@@ -212,6 +212,28 @@ export function MovesScreen() {
   }
 
   const parkedTotal = plan.plan.parked.reduce((s, p) => s + p.amount, 0);
+
+  if (parkedTotal <= 0) {
+    return (
+      <div className="flex flex-col gap-5 py-6">
+        <p className="label">Step 3 of 3</p>
+        <h1 className="display-section text-ink">Nothing to park in this plan.</h1>
+        <p className="max-w-[560px] text-[16px] text-charcoal">
+          SERV kept all <span className="num text-ink">{formatUsdc(plan.plan.liquid)}</span> USDC ready, so there&apos;s nothing to sign. Change your rules or
+          limits if you want Ebbryn to put some of it to work.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/setup" className="btn btn-primary">
+            Change inputs
+            <Arrow />
+          </Link>
+          <Link href="/plan" className="btn btn-soft">
+            Back to plan
+          </Link>
+        </div>
+      </div>
+    );
+  }
   const moves = load.kind === "ready" ? load.moves : [];
   const need = moves[0]?.amount ?? parkedTotal;
   const wrongChain = moves[0] && chainId !== null && chainId !== moves[0].chainId;
