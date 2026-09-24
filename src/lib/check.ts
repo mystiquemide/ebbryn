@@ -87,7 +87,10 @@ export function checkPlan(input: CheckInput): CheckResult {
   if (missing.length > 0) {
     const amount = missing.reduce((s, o) => s + o.amount, 0);
     const first = missing[0];
-    fail("COVER_ONCE", `${missing.length} payout(s) totalling ${formatUsdc(amount)} are not funded, starting with ${first.label} on ${first.date}.`);
+    fail(
+      "COVER_ONCE",
+      `${missing.length === 1 ? "1 payout" : `${missing.length} payouts`} totalling ${formatUsdc(amount)} ${missing.length === 1 ? "is" : "are"} not funded, starting with ${first.label} on ${first.date}.`,
+    );
   }
   plan.redemptions.forEach((r, i) => {
     const needed = sumOf(redemptionIds[i], byId);
