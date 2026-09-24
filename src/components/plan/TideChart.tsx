@@ -10,7 +10,7 @@ const dayLabel = (iso: string) =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
 // Ready cash rides above the baseline, parked cash sits below it in aqua. Drawn only from the plan's own timeline.
-export function TideChart({ days, balance }: { days: Day[]; balance: number }) {
+export function TideChart({ days, balance, start }: { days: Day[]; balance: number; start: { ready: number; parked: number } }) {
   const n = days.length;
   const x = (i: number) => (i / (n - 1)) * W;
   const up = (v: number) => BASE - (Math.max(v, 0) / balance) * (BASE - TOP);
@@ -33,13 +33,14 @@ export function TideChart({ days, balance }: { days: Day[]; balance: number }) {
     <figure className="rounded-[16px] bg-cloud p-5 md:p-6" style={{ boxShadow: "var(--shadow-cloud)" }}>
       <figcaption className="flex flex-wrap items-center justify-between gap-3">
         <span className="num text-[12px] uppercase tracking-[0.24px] text-charcoal">Next {n} days</span>
-        <span className="flex gap-4 text-[12px] text-charcoal">
+        <span className="flex flex-wrap gap-x-5 gap-y-1 text-[13px] text-charcoal">
           <span className="flex items-center gap-2">
-            <span className="h-[2px] w-4 bg-ink" aria-hidden="true" /> Ready in wallet
+            <span className="h-[2px] w-4 bg-ink" aria-hidden="true" /> Ready <span className="num text-ink">{formatUsdc(start.ready)}</span>
           </span>
           <span className="flex items-center gap-2">
-            <span className="h-3 w-4 rounded-[3px] bg-aqua" aria-hidden="true" /> Parked in vaults
+            <span className="h-3 w-4 rounded-[3px] bg-aqua" aria-hidden="true" /> Parked <span className="num text-ink">{formatUsdc(start.parked)}</span>
           </span>
+          <span className="text-slate">at the start</span>
         </span>
       </figcaption>
 
@@ -49,7 +50,7 @@ export function TideChart({ days, balance }: { days: Day[]; balance: number }) {
         <path d={readyPath} fill="none" stroke="#18181b" strokeWidth="2.5" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
         {marks.map((m, k) =>
           m.kind === "withdraw" ? (
-            <circle key={k} cx={x(m.i)} cy={BASE} r="7" fill="#ffffff" stroke="#18181b" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
+            <circle key={k} cx={x(m.i)} cy={BASE} r="8" fill="#94faf0" stroke="#18181b" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
           ) : (
             <line key={k} x1={x(m.i)} x2={x(m.i)} y1={TOP} y2={BASE} stroke="#18181b" strokeWidth="1" strokeDasharray="3 4" vectorEffect="non-scaling-stroke" />
           ),
@@ -73,9 +74,9 @@ export function TideChart({ days, balance }: { days: Day[]; balance: number }) {
             <li
               key={k}
               className="num inline-flex items-center gap-2 rounded-[6px] px-2 py-1 text-[11px]"
-              style={m.kind === "withdraw" ? { background: "#ffffff", color: "#18181b", boxShadow: "inset 0 0 0 1px #18181b" } : { background: "#27272a", color: "#ffffff" }}
+              style={m.kind === "withdraw" ? { background: "#94faf0", color: "#18181b" } : { background: "#27272a", color: "#ffffff" }}
             >
-              {dayLabel(m.date).toUpperCase()} · {m.kind === "withdraw" ? "WITHDRAW" : m.label} {formatUsdc(m.amount)}
+              {dayLabel(m.date).toUpperCase()} · {m.kind === "withdraw" ? "WITHDRAW FROM VAULT" : m.label} {formatUsdc(m.amount)}
             </li>
           ))}
         </ul>

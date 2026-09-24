@@ -27,29 +27,38 @@ const dayLabel = (iso: string) =>
 function ProofStrip({ meta }: { meta: PlanResult["meta"] }) {
   const [copied, setCopied] = useState(false);
   return (
-    <p className="num flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] text-slate">
-      <span>SERV {meta.model}</span>
-      {meta.features.map((f) => (
-        <span key={f}>· {f === "Shadow Agent" ? "Shadow Agent on" : f}</span>
-      ))}
-      {meta.requestId && (
-        <>
-          <span>· request {meta.requestId.slice(0, 8)}...</span>
-          <button
-            type="button"
-            className="rounded-[6px] bg-cloud px-2 py-1 text-ink hover:bg-steel"
-            onClick={() => {
-              navigator.clipboard?.writeText(meta.requestId!).then(
-                () => setCopied(true),
-                () => setCopied(false),
-              );
-            }}
-          >
-            {copied ? "Copied" : "Copy id"}
-          </button>
-        </>
-      )}
-    </p>
+    <details className="group rounded-[12px] bg-cloud px-4 py-3 text-[13px] text-charcoal">
+      <summary className="flex cursor-pointer list-none items-center justify-between">
+        <span>SERV run details</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" className="transition-transform group-open:rotate-180" aria-hidden="true">
+          <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </summary>
+      <dl className="num mt-3 grid gap-2 text-[12px] sm:grid-cols-[140px_1fr]">
+        <dt className="text-slate">Model</dt>
+        <dd className="break-all text-ink">{meta.model}</dd>
+        <dt className="text-slate">Features</dt>
+        <dd className="text-ink">{meta.features.map((f) => (f === "Shadow Agent" ? "Shadow Agent on" : f)).join(", ")}</dd>
+        <dt className="text-slate">Request id</dt>
+        <dd className="flex flex-wrap items-center gap-2 text-ink">
+          {meta.requestId ?? "Not recorded for this plan"}
+          {meta.requestId && (
+            <button
+              type="button"
+              className="rounded-[6px] bg-paper px-2 py-1 text-ink hover:bg-steel"
+              onClick={() => {
+                navigator.clipboard?.writeText(meta.requestId!).then(
+                  () => setCopied(true),
+                  () => setCopied(false),
+                );
+              }}
+            >
+              {copied ? "Copied" : "Copy"}
+            </button>
+          )}
+        </dd>
+      </dl>
+    </details>
   );
 }
 
@@ -78,7 +87,7 @@ export function PlanView({ result, children }: { result: PlanResult; children?: 
         <h1 className="display-section text-ink">
           {check.ok ? (
             <>
-              <span className="tabular-nums">{formatUsdc(plan.liquid)}</span> ready. <span className="tabular-nums">{formatUsdc(parkedTotal)}</span> earning.
+              <span className="tabular-nums">{formatUsdc(plan.liquid)}</span> ready. <span className="tabular-nums">{formatUsdc(parkedTotal)}</span> parked.
             </>
           ) : (
             "This plan didn't pass."
@@ -86,7 +95,7 @@ export function PlanView({ result, children }: { result: PlanResult; children?: 
         </h1>
       </header>
 
-      <TideChart days={days} balance={inputs.balance} />
+      <TideChart days={days} balance={inputs.balance} start={{ ready: plan.liquid, parked: parkedTotal }} />
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
         <section className="rounded-[16px] border border-steel bg-paper p-6" aria-labelledby="split-h">
@@ -129,6 +138,15 @@ export function PlanView({ result, children }: { result: PlanResult; children?: 
                   );
                 })}
               </ul>
+              {(() => {
+                const redeemed = plan.redemptions.reduce((t, r) => t + r.amount, 0);
+                const left = parkedTotal - redeemed;
+                return (
+                  <p className="mt-3 rounded-[10px] bg-cloud px-3 py-2 text-[13px] text-charcoal">
+                    After {plan.redemptions.length === 1 ? "that withdrawal" : "these withdrawals"}, <span className="num text-ink">{formatUsdc(left)}</span> stays parked.
+                  </p>
+                );
+              })()}
             </>
           )}
         </section>
@@ -142,7 +160,17 @@ export function PlanView({ result, children }: { result: PlanResult; children?: 
               <li key={k} className="flex gap-3">
                 <span className="num pt-[2px] text-[12px] text-white/55">{String(k + 1).padStart(2, "0")}</span>
                 <div>
-                  <p className="text-[15px] leading-[22px] text-white/90">{r.text}</p>
+                  {(() => {
+                    const m = r.text.match(/^(.+?[.;])\s+(.+)$/);
+                    return m ? (
+                      <>
+                        <p className="text-[15px] leading-[22px] text-white">{m[1]}</p>
+                        <p className="mt-1 text-[13px] leading-[19px] text-white/65">{m[2]}</p>
+                      </>
+                    ) : (
+                      <p className="text-[15px] leading-[22px] text-white">{r.text}</p>
+                    );
+                  })()}
                   <p className="mt-1 text-[12px] text-white/50">Rule: {r.rule.replace(/^"|"$/g, "")}</p>
                 </div>
               </li>

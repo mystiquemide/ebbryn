@@ -204,10 +204,13 @@ export function PlanScreen() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap gap-3">
               <Link href="/setup" className="btn btn-soft">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M13 8H4M7.5 4.5 4 8l3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
                 Change inputs
               </Link>
               <Link href="/plan?case=recorded" className="btn btn-soft">
-                See the plan SERV got wrong
+                View a plan Ebbryn rejected
               </Link>
             </div>
             {result.check.ok && result.signature ? (

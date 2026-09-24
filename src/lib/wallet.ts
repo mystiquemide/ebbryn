@@ -1,6 +1,6 @@
 "use client";
 
-import { createPublicClient, createWalletClient, custom, erc20Abi, formatUnits, http, type EIP1193Provider } from "viem";
+import { createPublicClient, createWalletClient, custom, decodeFunctionData, erc20Abi, formatUnits, http, type EIP1193Provider } from "viem";
 import { chainById } from "./chains";
 
 declare global {
@@ -100,4 +100,32 @@ export async function sendAndConfirm(
   const client = createPublicClient({ chain, transport: http() });
   const receipt = await client.waitForTransactionReceipt({ hash, timeout: 180_000 });
   return { hash, status: receipt.status };
+}
+
+export async function readNativeBalance(chainId: number, owner: `0x${string}`): Promise<number> {
+  const chain = chainById(chainId);
+  if (!chain) throw new WalletError(`Ebbryn doesn't know chain ${chainId}.`);
+  const client = createPublicClient({ chain, transport: http() });
+  return Number(formatUnits(await client.getBalance({ address: owner }), chain.nativeCurrency.decimals));
+}
+
+// Best effort: wallets that support it drop this site's access. Ebbryn forgets the account either way.
+export async function disconnectWallet(): Promise<void> {
+  try {
+    await window.ethereum?.request({ method: "wallet_revokePermissions" as never, params: [{ eth_accounts: {} }] as never });
+  } catch {
+    /* not every wallet supports revoking; local state is cleared regardless */
+  }
+}
+
+// Reads approve(spender, amount) out of an ERC-20 approve call so the UI can show exactly what is approved.
+export function decodeApprove(data: `0x${string}`): { spender: `0x${string}`; amount: bigint } | null {
+  try {
+    const d = decodeFunctionData({ abi: erc20Abi, data });
+    if (d.functionName !== "approve") return null;
+    const [spender, amount] = d.args as [`0x${string}`, bigint];
+    return { spender, amount };
+  } catch {
+    return null;
+  }
 }
