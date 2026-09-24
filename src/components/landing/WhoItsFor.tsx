@@ -1,28 +1,4 @@
-/* eslint-disable @next/next/no-img-element -- plain img with a hand-written srcSet for two static photos. */
-
-// Photos from Unsplash (Unsplash License), downloaded into public/photos:
-// payroll: https://unsplash.com/photos/man-operating-laptop-on-top-of-table-C3V88BOoRoM by Bench Accounting
-// agents:  https://unsplash.com/photos/a-group-of-people-working-on-computers-in-a-room-3yb7ZsaY0LY by Anastassia Anufrieva
-type Photo = { name: string; alt: string };
-
-const PAYROLL: Photo = { name: "payroll", alt: "A man working on a laptop at a wooden table by a window" };
-const AGENTS: Photo = { name: "agents", alt: "A small team working at computer monitors in an office" };
-
-function PhotoFigure({ p }: { p: Photo }) {
-  return (
-    <img
-      src={`/photos/${p.name}-1200.webp`}
-      srcSet={`/photos/${p.name}-600.webp 600w, /photos/${p.name}-1200.webp 1200w`}
-      sizes="(min-width: 1024px) 560px, 100vw"
-      alt={p.alt}
-      width={1200}
-      height={900}
-      loading="lazy"
-      className="aspect-[4/3] w-full rounded-[16px] bg-cloud object-cover"
-      style={{ boxShadow: "var(--shadow-cloud)" }}
-    />
-  );
-}
+import { FleetCard, PayrollRunway } from "./PlanCards";
 
 function Checks({ items }: { items: string[] }) {
   return (
@@ -44,9 +20,9 @@ function Checks({ items }: { items: string[] }) {
 export function WhoItsFor() {
   return (
     <section className="border-t border-steel" aria-label="Who Ebbryn is for">
-      <div className="container-page flex flex-col gap-20 py-20 md:gap-28 md:py-28">
+      <div className="container-page flex flex-col gap-16 py-16 md:gap-24 md:py-24">
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <PhotoFigure p={PAYROLL} />
+          <PayrollRunway />
           <div>
             <p className="label">Payroll teams</p>
             <h2 className="feature-heading mt-5 max-w-[520px] text-ink">Pay contractors in USDC? Your float can work until payday.</h2>
@@ -61,7 +37,7 @@ export function WhoItsFor() {
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="order-2 lg:order-1">
             <p className="label">Agent operators</p>
-            <h2 className="feature-heading mt-5 max-w-[520px] text-ink">Keep every agent funded, and the rest earning.</h2>
+            <h2 className="feature-heading mt-5 max-w-[520px] text-ink">Keep every agent funded. Put the rest to work.</h2>
             <p className="mt-5 max-w-[520px] text-[16px] leading-[24px] text-charcoal">
               Agents that pay for APIs need topped-up wallets every day. Ebbryn plans the fleet&apos;s daily spend as one schedule, so the
               buffer is sized in days instead of guesses.
@@ -69,7 +45,7 @@ export function WhoItsFor() {
             <Checks items={["Daily top-ups covered", "Buffer in days, not guesses", "One plan for the whole fleet"]} />
           </div>
           <div className="order-1 lg:order-2">
-            <PhotoFigure p={AGENTS} />
+            <FleetCard />
           </div>
         </div>
       </div>

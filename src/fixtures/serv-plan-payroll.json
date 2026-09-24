@@ -1,0 +1,93 @@
+{
+ "label": "Real SERV plan, Sep 24",
+ "recordedAt": "2026-09-24",
+ "requestId": "0520d265-1c98-4539-98f3-d0cf7f4d3173",
+ "model": "gpt-6-luna-serv-kronos-multipath",
+ "note": "Response from POST /api/plan against live SERV and live IXS. Vault is the IXS vault state at that time.",
+ "inputs": {
+  "balance": 128400,
+  "today": "2026-09-24",
+  "payouts": [
+   {
+    "id": "payroll",
+    "label": "Contractor payroll",
+    "amount": 42000,
+    "date": "2026-10-01",
+    "repeat": "semimonthly"
+   },
+   {
+    "id": "agents",
+    "label": "Agent fleet top-up",
+    "amount": 1200,
+    "date": "2026-09-24",
+    "repeat": "daily"
+   }
+  ],
+  "rules": "Never be short for payroll. Keep 3 days of agent spend liquid. Park the rest, but keep at least 50% of the balance liquid.",
+  "limits": {
+   "maxParkedPct": 60,
+   "minLiquidDays": 3
+  },
+  "windowDays": 30,
+  "vaults": [
+   {
+    "id": "97-0xcb09a5326aefd705d14ff4c5ca2bed7086ba0dcc",
+    "name": "IXHYB - BSC",
+    "network": "bsc-testnet",
+    "chainId": 97,
+    "address": "0xCb09a5326AEFD705d14FF4C5ca2beD7086ba0Dcc",
+    "asset": "0xbBCa80a7116aE46B0f249D279EF43f86274dc4f4",
+    "decimals": 6,
+    "settlement": "sync",
+    "lagDays": 0,
+    "acceptsDeposits": true,
+    "explorerUrl": "https://testnet.bscscan.com"
+   }
+  ]
+ },
+ "plan": {
+  "liquid": 81600,
+  "liquidFunds": [
+   "payroll@2026-10-01",
+   "agents@*"
+  ],
+  "parked": [
+   {
+    "vaultId": "97-0xcb09a5326aefd705d14ff4c5ca2bed7086ba0dcc",
+    "amount": 46800
+   }
+  ],
+  "redemptions": [
+   {
+    "vaultId": "97-0xcb09a5326aefd705d14ff4c5ca2bed7086ba0dcc",
+    "amount": 42000,
+    "requestDate": "2026-10-14",
+    "funds": [
+     "payroll@2026-10-15"
+    ]
+   }
+  ],
+  "reasons": [
+   {
+    "text": "Keep 81600 USDC liquid to cover the 42000 payroll due October 1, all 36000 of agent spend, and 3600 for the required three-day buffer.",
+    "rule": "\"Never be short for payroll. Keep 3 days of agent spend liquid.\""
+   },
+   {
+    "text": "Keep the additional 3600 USDC buffer beyond payout funds, equal to three days at 1200 USDC per day.",
+    "rule": "\"Keep 3 extra days of daily spend liquid on top of the payouts liquid funds.\""
+   },
+   {
+    "text": "Park 46800 USDC, the full amount remaining after liquid funds; this is below the 60% parking cap and leaves more than 50% of the balance liquid.",
+    "rule": "\"Park at most 60% of balance. Keep at least 50% of the balance liquid.\""
+   },
+   {
+    "text": "Use the listed sync vault because it accepts deposits; request 42000 USDC on October 14 so it is available before the October 15 payroll.",
+    "rule": "\"Park only in vaults where acceptsDeposits is true\"; \"A sync vault (lagDays 0) can be redeemed the day before a payout.\""
+   },
+   {
+    "text": "Liquid funds plus parked funds equal the 128400 USDC balance.",
+    "rule": "\"liquid + total parked equals the balance exactly.\""
+   }
+  ]
+ }
+}
