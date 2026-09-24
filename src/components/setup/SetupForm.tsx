@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useState } from "react";
 import { InputError, parsePlanInputs, WINDOW_DAYS } from "@/lib/input";
 import type { VaultInfo } from "@/lib/plan";
-import { expandSchedule, type Repeat } from "@/lib/schedule";
+import { dailySpend, expandSchedule, type Repeat } from "@/lib/schedule";
 import { STORAGE_KEY, slug, template, type SetupState } from "@/lib/templates";
 import { formatUsdc } from "@/lib/units";
 import { connectWallet, readTokenBalance, WalletError } from "@/lib/wallet";
@@ -55,6 +55,7 @@ export function SetupForm() {
   const [edited, setEdited] = useState(false);
   const [wallet, setWallet] = useState<{ status: "idle" | "busy" | "error"; message?: string }>({ status: "idle" });
   const [error, setError] = useState<string | null>(null);
+  const [leaving, setLeaving] = useState(false);
 
   // Restore the visitor's last setup from this browser, if any.
   useEffect(() => {
@@ -106,7 +107,9 @@ export function SetupForm() {
     const due = rows.reduce((s, r) => s + r.total, 0);
     const pct = num(state.limits.maxParkedPct);
     const maxPark = balance !== null && pct !== null ? (balance * pct) / 100 : null;
-    return { balance, rows, due, maxPark, pct, short: balance !== null ? due - balance : null };
+    const bufferDays = num(state.limits.minLiquidDays);
+    const buffer = bufferDays !== null ? dailySpend(payouts) * bufferDays : null;
+    return { balance, rows, due, maxPark, pct, bufferDays, buffer, short: balance !== null ? due - balance : null };
   }, [state, today]);
 
   const useWalletBalance = async () => {
@@ -139,6 +142,7 @@ export function SetupForm() {
     try {
       const inputs = parsePlanInputs(body, today);
       localStorage.setItem(INPUTS_KEY, JSON.stringify(inputs));
+      setLeaving(true);
       router.push("/plan");
     } catch (e) {
       setError(e instanceof InputError ? e.message : "Something in the form isn't right. Check the fields and try again.");
@@ -162,6 +166,15 @@ export function SetupForm() {
     });
 
   const canPlan = summary.balance !== null && state.payouts.length > 0;
+
+  const cta = (extra: string) => (
+    <>
+      <button type="button" onClick={submit} disabled={!canPlan || leaving} className={`btn btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50 ${extra}`}>
+        {leaving ? "Planning your cash..." : "Plan my cash"}
+        {!leaving && <Arrow />}
+      </button>
+    </>
+  );
 
   return (
     <div className="container-page grid gap-10 py-12 md:py-16 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
@@ -308,7 +321,12 @@ export function SetupForm() {
           <h2 id="limits-h" className="feature-heading text-ink">
             Hard limits
           </h2>
-          <p className="-mt-2 text-[14px] text-slate">Ebbryn&apos;s checks enforce these, whatever the rules say.</p>
+          <p className="flex items-center gap-3 rounded-[12px] px-4 py-3 text-[14px] text-ink" style={{ background: "rgba(148,250,240,0.25)", boxShadow: "inset 0 0 0 1px #94faf0" }}>
+            <span className="grid h-5 w-5 shrink-0 place-items-center rounded-[6px] bg-aqua" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 16 16"><path d="M8 3.5v5M8 11.5v.5" stroke="#18181b" strokeWidth="2" strokeLinecap="round" /></svg>
+            </span>
+            Ebbryn&apos;s checks enforce these, whatever the rules say.
+          </p>
           <div className="flex flex-wrap gap-6">
             <Field label="Park at most">
               {(id) => (
@@ -328,6 +346,14 @@ export function SetupForm() {
             </Field>
           </div>
         </section>
+
+        <div className="flex flex-col gap-3 border-t border-steel pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[14px] text-slate">
+            {leaving ? "SERV is evaluating your payouts and rules. Usually 40 to 70 seconds." : canPlan ? "SERV plans usually take 40 to 70 seconds." : "Add a balance and at least one payout to plan."}
+          </p>
+          <div className="sm:w-[240px]">{cta("")}</div>
+        </div>
+        {error && <p className="-mt-6 rounded-[12px] p-3 text-[13px] text-paper" style={{ background: "#b3261e" }}>{error}</p>}
       </div>
 
       <aside className="lg:sticky lg:top-6">
@@ -351,8 +377,15 @@ export function SetupForm() {
               </div>
             ))}
             <div className="flex justify-between border-t border-white/10 pt-3">
-              <dt className="text-white/70">Most you allow parked</dt>
-              <dd className="num">{summary.maxPark !== null ? formatUsdc(summary.maxPark) : "Not set"}</dd>
+              <dt className="text-white/70">Buffer kept ready{summary.bufferDays !== null ? `: ${summary.bufferDays} days` : ""}</dt>
+              <dd className="num">{summary.buffer !== null ? formatUsdc(summary.buffer) : "Not set"}</dd>
+            </div>
+            <div className="flex flex-col gap-1 border-t border-white/10 pt-3">
+              <div className="flex justify-between">
+                <dt className="text-white/70">Most you allow parked</dt>
+                <dd className="num">{summary.maxPark !== null ? formatUsdc(summary.maxPark) : "Not set"}</dd>
+              </div>
+              {summary.pct !== null && <p className="text-[12px] text-white/50">Capped by your {summary.pct}% hard limit.</p>}
             </div>
           </dl>
           {summary.short !== null && summary.short > 0 && (
@@ -360,12 +393,13 @@ export function SetupForm() {
               Payouts in the next {WINDOW_DAYS} days are {formatUsdc(summary.short)} more than your balance. Ebbryn won&apos;t park anything.
             </p>
           )}
-          <button type="button" onClick={submit} disabled={!canPlan} className="btn btn-primary mt-6 w-full disabled:cursor-not-allowed disabled:opacity-50">
-            Plan my cash
-            <Arrow />
-          </button>
+          {cta("mt-6")}
           <p className="mt-3 text-[13px] text-white/55">
-            {canPlan ? "SERV plans usually take 40 to 70 seconds." : "Add a balance and at least one payout to plan."}
+            {leaving
+              ? "SERV is evaluating your payouts and rules. Usually 40 to 70 seconds."
+              : canPlan
+                ? "SERV plans usually take 40 to 70 seconds."
+                : "Add a balance and at least one payout to plan."}
           </p>
           {error && <p className="mt-3 rounded-[12px] p-3 text-[13px] text-paper" style={{ background: "rgba(179,38,30,0.35)" }}>{error}</p>}
         </div>
