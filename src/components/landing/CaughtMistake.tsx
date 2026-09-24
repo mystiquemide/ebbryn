@@ -31,6 +31,11 @@ function runRecorded() {
 
 export function CaughtMistake() {
   const result = runRecorded();
+  // One card per failed check, so failed + passed always adds up to 8.
+  const failed = [...new Set(result.failures.map((f) => f.code))].map((code) => ({
+    code,
+    details: result.failures.filter((f) => f.code === code).map((f) => f.detail),
+  }));
   const raw = recorded.rawOutput;
 
   return (
@@ -76,12 +81,12 @@ export function CaughtMistake() {
             <figcaption className="flex flex-wrap items-center justify-between gap-2">
               <span className="num text-[12px] uppercase tracking-[0.24px] text-white/55">What Ebbryn&apos;s checks found</span>
               <span className="num text-[12px] text-white/55">
-                {result.passed.length} of 8 passed
+                {failed.length} failed, {result.passed.length} passed
               </span>
             </figcaption>
             <ul className="mt-6 flex flex-col gap-3">
-              {result.failures.map((f, i) => (
-                <li key={i} className="rounded-[12px] bg-white/[0.04] p-4" style={{ boxShadow: "inset 0 0 0 1px rgba(179,38,30,0.6)" }}>
+              {failed.map((f) => (
+                <li key={f.code} className="rounded-[12px] bg-white/[0.04] p-4" style={{ boxShadow: "inset 0 0 0 1px rgba(179,38,30,0.6)" }}>
                   <p className="flex items-center gap-2">
                     <span className="grid h-5 w-5 place-items-center rounded-[6px] bg-alert text-[12px] text-paper" aria-hidden="true">
                       ×
@@ -89,7 +94,13 @@ export function CaughtMistake() {
                     <span className="text-[15px] text-paper">{PLAIN[f.code] ?? f.code}</span>
                     <span className="num ml-auto text-[11px] text-white/55">{f.code}</span>
                   </p>
-                  <p className="mt-2 text-[14px] leading-[21px] text-white/70">{f.detail}</p>
+                  <ul className="mt-2 flex flex-col gap-1">
+                    {f.details.map((d) => (
+                      <li key={d} className="text-[14px] leading-[21px] text-white/70">
+                        {d}
+                      </li>
+                    ))}
+                  </ul>
                 </li>
               ))}
             </ul>

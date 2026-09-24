@@ -65,7 +65,7 @@ export function IdleCash() {
         Money waiting for payday earns nothing.
       </h2>
       <p className="mt-5 max-w-[560px] text-[18px] leading-[27px] text-slate">
-        Stablecoin issuers aren&apos;t allowed to pay you interest, so USDC parked for payroll earns 0%. Put in your own numbers.
+        USDC sitting idle doesn&apos;t earn yield on its own. Put in your own numbers.
       </p>
 
       <div className="mt-10 rounded-[16px] bg-cloud p-6 md:p-10" style={{ boxShadow: "var(--shadow-cloud)" }}>
@@ -93,10 +93,7 @@ export function IdleCash() {
           )}
         </div>
 
-        <p className="mt-6 text-[13px] text-slate">
-          Starting example: a small business owner on r/smallbusiness earned $18 in a year on $180,000 of idle cash. The days and the rate
-          are yours to change.
-        </p>
+        <p className="mt-6 text-[13px] text-slate">The starting numbers are an example. Change any of them.</p>
       </div>
     </section>
   );
