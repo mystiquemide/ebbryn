@@ -20,3 +20,9 @@ export function networkCopy(network: string): string {
 export function heroVaults(vaults: VaultInfo[], max = 3): VaultInfo[] {
   return [...vaults].sort((a, b) => Number(b.acceptsDeposits) - Number(a.acceptsDeposits)).slice(0, max);
 }
+
+export function asOfCopy(iso: string): string {
+  const d = new Date(iso);
+  const when = d.toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "UTC" });
+  return `IXS testnet, as of ${when} UTC`;
+}

@@ -1,9 +1,7 @@
 import { Suspense } from "react";
-import { listVaults } from "@/lib/ixs";
+import { listVaultsForDisplay } from "@/lib/ixs";
 import type { VaultInfo } from "@/lib/plan";
-import { heroVaults, networkCopy, withdrawalCopy } from "@/lib/vaultCopy";
-
-const HEADERS = ["Vault", "Network", "Withdrawals", "Deposits"];
+import { asOfCopy, networkCopy, withdrawalCopy } from "@/lib/vaultCopy";
 
 function Deposits({ v }: { v: VaultInfo }) {
   return (
@@ -11,6 +9,17 @@ function Deposits({ v }: { v: VaultInfo }) {
       <span className="h-[6px] w-4 rounded-full" style={{ background: v.acceptsDeposits ? "#94faf0" : "#d4d4d8" }} aria-hidden="true" />
       {v.acceptsDeposits ? "Open" : "Paused"}
     </span>
+  );
+}
+
+function Row({ v }: { v: VaultInfo }) {
+  return (
+    <li className="grid gap-1 border-b border-steel px-6 py-5 last:border-b-0 sm:grid-cols-[1.4fr_1fr_1.2fr_auto] sm:items-center sm:gap-6">
+      <p className="text-[16px] text-ink">{v.name}</p>
+      <p className="text-[14px] text-charcoal">{networkCopy(v.network)}</p>
+      <p className="text-[14px] text-charcoal">{withdrawalCopy(v)}</p>
+      <Deposits v={v} />
+    </li>
   );
 }
 
@@ -23,69 +32,41 @@ function Panel({ children, note }: { children: React.ReactNode; note: string }) 
   );
 }
 
-function Message({ text }: { text: string }) {
-  return <p className="px-6 py-8 text-[16px] text-charcoal">{text}</p>;
-}
-
 async function VaultList() {
-  const vaults = await listVaults()
-    .then((list) => heroVaults(list, 50))
-    .catch(() => null);
-
-  if (vaults === null) {
-    return (
-      <Panel note="These are IXS testnet vaults. Mainnet access requires IXS verification.">
-        <Message text="IXS is not answering right now, so the vault list can't be shown. Try again in a minute." />
-      </Panel>
-    );
-  }
-  if (vaults.length === 0) {
-    return (
-      <Panel note="These are IXS testnet vaults. Mainnet access requires IXS verification.">
-        <Message text="IXS lists no testnet vaults right now." />
-      </Panel>
-    );
-  }
+  const { vaults, asOf, live } = await listVaultsForDisplay();
+  const open = vaults.filter((v) => v.acceptsDeposits);
+  const paused = vaults.filter((v) => !v.acceptsDeposits);
+  const note = `${live ? "Live from IXS testnet" : asOfCopy(asOf)}. Mainnet access requires IXS verification.`;
 
   return (
-    <Panel note="These are IXS testnet vaults. Mainnet access requires IXS verification.">
-      <table className="hidden w-full text-left text-[14px] sm:table">
-        <thead>
-          <tr className="border-b border-steel">
-            {HEADERS.map((h) => (
-              <th key={h} scope="col" className="num px-6 py-4 text-[12px] font-normal uppercase tracking-[0.24px] text-slate">
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {vaults.map((v) => (
-            <tr key={v.id} className="border-b border-steel last:border-b-0">
-              <td className="px-6 py-4 text-[16px] text-ink">{v.name}</td>
-              <td className="px-6 py-4 text-charcoal">{networkCopy(v.network)}</td>
-              <td className="px-6 py-4 text-charcoal">{withdrawalCopy(v)}</td>
-              <td className="px-6 py-4">
-                <Deposits v={v} />
-              </td>
-            </tr>
+    <Panel note={note}>
+      <p className="num px-6 pt-5 text-[12px] uppercase tracking-[0.24px] text-slate">
+        Open for deposits ({open.length})
+      </p>
+      {open.length > 0 ? (
+        <ul className="mt-2">
+          {open.map((v) => (
+            <Row key={v.id} v={v} />
           ))}
-        </tbody>
-      </table>
-
-      <ul className="sm:hidden">
-        {vaults.map((v) => (
-          <li key={v.id} className="border-b border-steel px-6 py-5 last:border-b-0">
-            <div className="flex items-start justify-between gap-4">
-              <p className="text-[16px] text-ink">{v.name}</p>
-              <Deposits v={v} />
-            </div>
-            <p className="mt-1 text-[14px] text-charcoal">
-              {networkCopy(v.network)} · {withdrawalCopy(v)}
-            </p>
-          </li>
-        ))}
-      </ul>
+        </ul>
+      ) : (
+        <p className="px-6 py-5 text-[16px] text-charcoal">No IXS vault is taking deposits right now, so Ebbryn keeps everything ready.</p>
+      )}
+      {paused.length > 0 && (
+        <details className="group border-t border-steel">
+          <summary className="flex cursor-pointer list-none items-center justify-between px-6 py-4 text-[14px] text-charcoal hover:text-ink">
+            <span>Other IXS vaults, paused right now ({paused.length})</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" className="transition-transform group-open:rotate-180" aria-hidden="true">
+              <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </summary>
+          <ul className="border-t border-steel">
+            {paused.map((v) => (
+              <Row key={v.id} v={v} />
+            ))}
+          </ul>
+        </details>
+      )}
     </Panel>
   );
 }
@@ -96,15 +77,15 @@ export function Vaults() {
       <div className="container-page py-20 md:py-28">
         <p className="label">Where the money goes</p>
         <h2 id="vaults-heading" className="display-section mt-5 max-w-[980px] text-ink">
-          Licensed RWA vaults from IXS.
+          RWA vaults from IXS.
         </h2>
         <p className="mt-5 max-w-[600px] text-[18px] leading-[27px] text-slate">
-          Read live from IXS. Ebbryn only parks money in a vault that is open for deposits right now.
+          Read from IXS. Ebbryn only parks money in a vault that is open for deposits right now.
         </p>
         <Suspense
           fallback={
-            <Panel note="These are IXS testnet vaults. Mainnet access requires IXS verification.">
-              <Message text="Reading IXS vaults." />
+            <Panel note="Mainnet access requires IXS verification.">
+              <p className="px-6 py-8 text-[16px] text-charcoal">Reading IXS vaults.</p>
             </Panel>
           }
         >

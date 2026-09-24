@@ -1,0 +1,57 @@
+{
+ "vaults": [
+  {
+   "id": "43113-0x648c66e8791b1ea20f01db549b49de7fba3f2a53",
+   "name": "IXHYB - Avalanche",
+   "network": "avalanche-testnet",
+   "chainId": 43113,
+   "address": "0x648c66E8791B1Ea20f01db549B49dE7FBa3f2a53",
+   "asset": "0xbBCa80a7116aE46B0f249D279EF43f86274dc4f4",
+   "decimals": 6,
+   "settlement": "async-erc7540",
+   "lagDays": 2,
+   "acceptsDeposits": false,
+   "explorerUrl": "https://testnet.snowscan.xyz"
+  },
+  {
+   "id": "97-0x45b962394995e3fbfa83229fbe97591deb1ddcc4",
+   "name": "t_ix7540v1",
+   "network": "bsc-testnet",
+   "chainId": 97,
+   "address": "0x45B962394995e3FbFa83229Fbe97591dEb1DDCc4",
+   "asset": "0xbBCa80a7116aE46B0f249D279EF43f86274dc4f4",
+   "decimals": 6,
+   "settlement": "async-erc7540",
+   "lagDays": 2,
+   "acceptsDeposits": false,
+   "explorerUrl": "https://testnet.bscscan.com"
+  },
+  {
+   "id": "5042002-0x4a8b74a9d246082b671540492222e89c9a866498",
+   "name": "IXHYB - Arc",
+   "network": "arc-testnet",
+   "chainId": 5042002,
+   "address": "0x4a8B74A9d246082b671540492222e89c9A866498",
+   "asset": "0x3600000000000000000000000000000000000000",
+   "decimals": 6,
+   "settlement": "async-erc7540",
+   "lagDays": 2,
+   "acceptsDeposits": false,
+   "explorerUrl": "https://testnet.arcscan.app"
+  },
+  {
+   "id": "97-0xcb09a5326aefd705d14ff4c5ca2bed7086ba0dcc",
+   "name": "IXHYB - BSC",
+   "network": "bsc-testnet",
+   "chainId": 97,
+   "address": "0xCb09a5326AEFD705d14FF4C5ca2beD7086ba0Dcc",
+   "asset": "0xbBCa80a7116aE46B0f249D279EF43f86274dc4f4",
+   "decimals": 6,
+   "settlement": "sync",
+   "lagDays": 0,
+   "acceptsDeposits": true,
+   "explorerUrl": "https://testnet.bscscan.com"
+  }
+ ],
+ "asOf": "2026-09-24T13:55:01.000Z"
+}

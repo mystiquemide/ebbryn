@@ -1,3 +1,4 @@
+import snapshot from "@/data/ixs-vaults.snapshot.json";
 import type { Settlement, VaultInfo } from "./plan";
 
 const MCP_URL = process.env.IXS_MCP_URL ?? "https://api-dev-v2.ixs.finance/mcp";
@@ -31,7 +32,16 @@ export function parseSse(body: string): unknown {
   }
 }
 
-export async function mcpCall<T>(name: string, args: Record<string, unknown>): Promise<T> {
+// IXS MCP drops concurrent requests (tested: 6 of 8 parallel calls hung), so calls go out one at a time.
+let queue: Promise<unknown> = Promise.resolve();
+
+export function mcpCall<T>(name: string, args: Record<string, unknown>): Promise<T> {
+  const run = queue.then(() => mcpCallNow<T>(name, args));
+  queue = run.catch(() => undefined);
+  return run;
+}
+
+async function mcpCallNow<T>(name: string, args: Record<string, unknown>): Promise<T> {
   const res = await fetch(MCP_URL, {
     method: "POST",
     headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
@@ -99,14 +109,29 @@ export async function listVaults(): Promise<VaultInfo[]> {
   if (!res.ok) throw new IxsError(`IXS vault list failed with HTTP ${res.status}`);
   const list = (await res.json()) as { items?: RawVault[] };
   const items = (list.items ?? []).filter((v) => (v.status ?? "active") === "active" && /testnet/.test(v.network));
-  const vaults = await Promise.all(
-    items.map(async (raw) => {
-      const detail = await mcpCall<VaultGet>("vault_get", { vaultId: raw.routeId });
-      return toVaultInfo(raw, detail.settlement, await acceptsDeposits(raw.routeId, raw.requiresWhitelist));
-    }),
-  );
+  const vaults: VaultInfo[] = [];
+  for (const raw of items) {
+    const detail = await mcpCall<VaultGet>("vault_get", { vaultId: raw.routeId });
+    vaults.push(toVaultInfo(raw, detail.settlement, await acceptsDeposits(raw.routeId, raw.requiresWhitelist)));
+  }
   cache = { at: Date.now(), vaults };
+  lastGood = { vaults, asOf: new Date().toISOString() };
   return vaults;
+}
+
+export type VaultDisplay = { vaults: VaultInfo[]; asOf: string; live: boolean };
+
+// Real IXS data captured from the live API, used only for display when IXS is not answering.
+let lastGood: { vaults: VaultInfo[]; asOf: string } = snapshot as { vaults: VaultInfo[]; asOf: string };
+
+// For marketing surfaces only. Planning and moves always call listVaults() and fail closed.
+export async function listVaultsForDisplay(): Promise<VaultDisplay> {
+  try {
+    const vaults = await listVaults();
+    return { vaults, asOf: lastGood.asOf, live: true };
+  } catch {
+    return { vaults: lastGood.vaults, asOf: lastGood.asOf, live: false };
+  }
 }
 
 export async function buildDeposit(vaultId: string, owner: string, baseUnits: string): Promise<McpStep[]> {
