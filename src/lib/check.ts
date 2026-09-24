@@ -14,6 +14,11 @@ export type CheckInput = {
 
 const EPS = 0.01;
 
+const day = (iso: string) =>
+  /^\d{4}-\d{2}-\d{2}$/.test(iso)
+    ? new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })
+    : iso;
+
 function expandRefs(refs: string[], occurrences: Occurrence[]): { ids: string[]; unknown: string[] } {
   const ids: string[] = [];
   const unknown: string[] = [];
@@ -48,23 +53,23 @@ export function checkPlan(input: CheckInput): CheckResult {
   // SUM
   const total = plan.liquid + totalParked;
   if (Math.abs(total - balance) > EPS) {
-    fail("SUM", `Liquid ${formatUsdc(plan.liquid)} + parked ${formatUsdc(totalParked)} = ${formatUsdc(total)}, balance is ${formatUsdc(balance)}.`);
+    fail("SUM", `Ready ${formatUsdc(plan.liquid)} plus parked ${formatUsdc(totalParked)} makes ${formatUsdc(total)}, but you hold ${formatUsdc(balance)}.`);
   }
   if (plan.liquid < 0 || plan.parked.some((p) => p.amount < 0) || plan.redemptions.some((r) => r.amount < 0)) {
-    fail("SUM", "Amounts cannot be negative.");
+    fail("SUM", "The plan has a negative amount, which isn't possible.");
   }
 
   // CAP
   const cap = round2((balance * limits.maxParkedPct) / 100);
   if (totalParked > cap + EPS) {
-    fail("CAP", `Parked ${formatUsdc(totalParked)} is over the ${limits.maxParkedPct}% limit of ${formatUsdc(cap)}.`);
+    fail("CAP", `Parked ${formatUsdc(totalParked)} is over your ${limits.maxParkedPct}% limit of ${formatUsdc(cap)}.`);
   }
 
   // CLOSED
   for (const p of plan.parked) {
     const v = vaultById.get(p.vaultId);
-    if (!v) fail("CLOSED", `Vault ${p.vaultId} is not a known IXS vault.`);
-    else if (p.amount > 0 && !v.acceptsDeposits) fail("CLOSED", `${v.name} (${v.network}) is not accepting deposits.`);
+    if (!v) fail("CLOSED", "The plan parks money in a vault IXS doesn't list.");
+    else if (p.amount > 0 && !v.acceptsDeposits) fail("CLOSED", `${v.name} isn't taking deposits right now.`);
   }
 
   // COVER_ONCE
@@ -78,44 +83,47 @@ export function checkPlan(input: CheckInput): CheckResult {
     for (const id of refs.ids) count.set(id, (count.get(id) ?? 0) + 1);
     return refs.ids;
   });
-  for (const ref of unknownRefs) fail("COVER_ONCE", `Plan funds ${ref}, which is not a scheduled payout.`);
+  for (const ref of unknownRefs) {
+    const when = ref.split("@")[1];
+    fail("COVER_ONCE", `The plan pays for something that isn't on your schedule${when && when !== "*" ? ` (${day(when)})` : ""}.`);
+  }
   const doubled = occurrences.filter((o) => (count.get(o.id) ?? 0) > 1);
   const missing = occurrences.filter((o) => !count.has(o.id));
   for (const o of doubled) {
-    fail("COVER_ONCE", `${o.label} on ${o.date} (${formatUsdc(o.amount)}) is funded ${count.get(o.id)} times.`);
+    fail("COVER_ONCE", `${o.label} on ${day(o.date)} (${formatUsdc(o.amount)}) is funded ${count.get(o.id)} times.`);
   }
   if (missing.length > 0) {
     const amount = missing.reduce((s, o) => s + o.amount, 0);
     const first = missing[0];
     fail(
       "COVER_ONCE",
-      `${missing.length === 1 ? "1 payout" : `${missing.length} payouts`} totalling ${formatUsdc(amount)} ${missing.length === 1 ? "is" : "are"} not funded, starting with ${first.label} on ${first.date}.`,
+      `${missing.length === 1 ? "1 payout" : `${missing.length} payouts`} totalling ${formatUsdc(amount)} ${missing.length === 1 ? "is" : "are"} not funded, starting with ${first.label} on ${day(first.date)}.`,
     );
   }
   plan.redemptions.forEach((r, i) => {
     const needed = sumOf(redemptionIds[i], byId);
     if (r.amount + EPS < needed) {
-      fail("COVER_ONCE", `Redemption of ${formatUsdc(r.amount)} on ${r.requestDate} is less than the ${formatUsdc(needed)} it funds.`);
+      fail("COVER_ONCE", `The ${day(r.requestDate)} withdrawal of ${formatUsdc(r.amount)} is less than the ${formatUsdc(needed)} it has to cover.`);
     }
   });
 
   // LIQUID_COVER
   const liquidNeeded = sumOf(liquidRefs.ids, byId) + dailySpend(payouts) * limits.minLiquidDays;
   if (plan.liquid + EPS < liquidNeeded) {
-    fail("LIQUID_COVER", `Liquid ${formatUsdc(plan.liquid)} is below the ${formatUsdc(liquidNeeded)} needed for the payouts it funds plus ${limits.minLiquidDays} extra days of daily spend.`);
+    fail("LIQUID_COVER", `Ready cash of ${formatUsdc(plan.liquid)} is short of the ${formatUsdc(liquidNeeded)} needed for its payouts and your ${limits.minLiquidDays}-day buffer.`);
   }
 
   // TIMING
   plan.redemptions.forEach((r, i) => {
     const v = vaultById.get(r.vaultId);
     const lag = v?.lagDays ?? 0;
-    if (r.requestDate < today) fail("TIMING", `Redemption request on ${r.requestDate} is in the past.`);
+    if (r.requestDate < today) fail("TIMING", `The withdrawal on ${day(r.requestDate)} is already in the past.`);
     const dates = redemptionIds[i].map((id) => byId.get(id)!.date).sort();
     if (dates.length === 0) return;
     const lands = addDays(r.requestDate, lag);
     const deadline = addDays(dates[0], -1);
     if (lands > deadline) {
-      fail("TIMING", `Redemption requested ${r.requestDate} lands ${lands}, after the ${deadline} deadline for the ${dates[0]} payout.`);
+      fail("TIMING", `The ${day(r.requestDate)} withdrawal arrives ${day(lands)}, too late for the ${day(dates[0])} payout.`);
     }
   });
 
@@ -127,7 +135,7 @@ export function checkPlan(input: CheckInput): CheckResult {
   for (const [vaultId, redeemed] of redeemedByVault) {
     const parked = parkedByVault.get(vaultId) ?? 0;
     if (redeemed > parked + EPS) {
-      fail("REDEEM_LE_PARKED", `Redeeming ${formatUsdc(redeemed)} from ${vaultId} but only ${formatUsdc(parked)} is parked there.`);
+      fail("REDEEM_LE_PARKED", `The plan withdraws ${formatUsdc(redeemed)} from ${vaultById.get(vaultId)?.name ?? "a vault"}, but only ${formatUsdc(parked)} is parked there.`);
     }
   }
 
@@ -142,8 +150,8 @@ export function checkPlan(input: CheckInput): CheckResult {
       },
       { running: 0, found: null as Occurrence | null },
     );
-    const where = short.found ? `${short.found.label} on ${short.found.date}` : "the window";
-    fail("SHORTFALL", `Payouts total ${formatUsdc(due)}, ${formatUsdc(due - balance)} more than the balance. First short: ${where}. Nothing should be parked.`);
+    const where = short.found ? `${short.found.label} on ${day(short.found.date)}` : "the next 30 days";
+    fail("SHORTFALL", `Your payouts need ${formatUsdc(due - balance)} more than you hold, starting with ${where}. Ebbryn won't park anything.`);
   }
 
   const failed = new Set(failures.map((f) => f.code));

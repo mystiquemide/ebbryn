@@ -29,26 +29,26 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return bad(400, "Body must be valid JSON");
+    return bad(400, "Something didn't come through. Refresh the page and try again.");
   }
   const { inputs, plan, signature, owner } = body;
-  if (!inputs || !plan || typeof signature !== "string") return bad(400, "inputs, plan and signature are required");
-  if (typeof owner !== "string" || !isAddress(owner)) return bad(400, "owner must be a wallet address");
+  if (!inputs || !plan || typeof signature !== "string") return bad(400, "There's no checked plan to sign. Make a plan first.");
+  if (typeof owner !== "string" || !isAddress(owner)) return bad(400, "Connect a wallet so IXS can prepare the transactions for it.");
 
   try {
-    if (!verifyPayload({ inputs, plan }, signature)) return bad(400, "This plan was not signed by Ebbryn or was changed after signing.");
+    if (!verifyPayload({ inputs, plan }, signature)) return bad(400, "This plan was changed after Ebbryn checked it, so it can't be used. Make a new plan.");
   } catch {
-    return bad(400, "This plan was not signed by Ebbryn or was changed after signing.");
+    return bad(400, "This plan was changed after Ebbryn checked it, so it can't be used. Make a new plan.");
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  if (daysBetween(inputs.today, today) > 1) return bad(409, "This plan is out of date. Replan before signing.");
+  if (daysBetween(inputs.today, today) > 1) return bad(409, "This plan is more than a day old. Make a new plan before signing.");
 
   try {
     const vaults = await listVaults();
     const occurrences = expandSchedule(inputs.payouts, inputs.today, WINDOW_DAYS);
     const check = checkPlan({ plan, ...inputs, occurrences, vaults });
-    if (!check.ok) return bad(409, "The plan no longer passes its checks.", { failures: check.failures });
+    if (!check.ok) return bad(409, "Something changed since you planned, like a vault closing, so this plan no longer passes. Make a new plan.", { failures: check.failures });
 
     const moves: Move[] = [];
     for (const p of plan.parked) {
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
       const steps = await buildDeposit(v.id, owner, baseUnits);
       const allowed = new Set([v.address.toLowerCase(), v.asset.toLowerCase()]);
       if (steps.some((s) => !allowed.has(s.tx.to.toLowerCase()))) {
-        return bad(502, `IXS returned a transaction for an unexpected contract on ${v.name}. Nothing to sign.`);
+        return bad(502, `IXS sent a transaction for a contract Ebbryn doesn't expect on ${v.name}, so Ebbryn blocked it. Nothing to sign. Try again later.`);
       }
       moves.push({
         vaultId: v.id,
@@ -76,8 +76,8 @@ export async function POST(req: Request) {
     }
     return Response.json({ moves });
   } catch (e) {
-    if (e instanceof IxsError) return bad(502, `IXS: ${e.message}`);
     console.error(e);
-    return bad(500, "Could not build moves. Nothing was changed.");
+    if (e instanceof IxsError) return bad(502, "IXS couldn't prepare your transactions. Nothing was changed. Try again in a minute.");
+    return bad(500, "IXS couldn't prepare your transactions. Nothing was changed. Try again in a minute.");
   }
 }

@@ -96,7 +96,7 @@ export function MovesScreen() {
         });
         const body = await res.json().catch(() => ({}));
         if (res.status === 409) return setLoad({ kind: "stale", message: body.error ?? "This plan is out of date." });
-        if (!res.ok) return setLoad({ kind: "error", message: body.error ?? "Couldn't build the moves. Nothing was changed." });
+        if (!res.ok) return setLoad({ kind: "error", message: body.error ?? "IXS couldn't prepare your transactions. Nothing was changed. Try again in a minute." });
         const moves = body.moves as Move[];
         setLoad({ kind: "ready", moves });
 
@@ -131,7 +131,7 @@ export function MovesScreen() {
         }
         setSteps(restored);
       } catch {
-        setLoad({ kind: "error", message: "Couldn't reach Ebbryn. Nothing was changed." });
+        setLoad({ kind: "error", message: "Couldn't reach Ebbryn. Check your connection and try again. Nothing was changed." });
       }
     },
     [plan, signature],
@@ -145,7 +145,7 @@ export function MovesScreen() {
       setChainId(await walletChainId());
       await buildMoves(acc);
     } catch (e) {
-      setWalletMsg(e instanceof WalletError ? e.message : "The wallet couldn't connect.");
+      setWalletMsg(e instanceof WalletError ? e.message : "Your wallet didn't connect. Open it, make sure it's unlocked, and try again.");
     }
   };
 
@@ -189,7 +189,7 @@ export function MovesScreen() {
         setSteps((s) => ({ ...s, [key]: { kind: "reverted", hash: out.hash } }));
       }
     } catch (e) {
-      setSteps((s) => ({ ...s, [key]: { kind: "error", message: e instanceof WalletError ? e.message : "Something went wrong. Nothing moved." } }));
+      setSteps((s) => ({ ...s, [key]: { kind: "error", message: e instanceof WalletError ? e.message : "That didn't go through. Nothing moved. Try again, or refresh the page if it keeps happening." } }));
     }
   };
 
@@ -307,10 +307,10 @@ export function MovesScreen() {
               ],
               ["Network", wrongChain ? "Other network" : networkCopy(moves[0].network), !wrongChain && chainId !== null],
             ].map(([label, value, ok]) => (
-              <div key={String(label)} className="contents">
+              <div key={String(label)} className="contents" role="group" aria-label={`${label}: ${value}, ${ok ? "ready" : "not ready"}`}>
                 <dt className="text-charcoal">{label}</dt>
                 <dd className="text-right text-ink">{value}</dd>
-                <dd aria-label={ok ? "ready" : "not ready"}>
+                <dd aria-hidden="true">
                   <span
                     className="grid h-5 w-5 place-items-center rounded-[6px] text-[12px]"
                     style={ok ? { background: "#bff660", color: "#18181b" } : { background: "#b3261e", color: "#ffffff" }}
@@ -427,7 +427,7 @@ export function MovesScreen() {
                       </button>
                       {!canSign && st.kind === "idle" && (
                         <span className="text-[12px] text-slate">
-                          {!account ? "Connect a wallet first." : wrongChain ? "Switch networks first." : shortOfFunds ? "Not enough USDC." : noGas ? `Not enough ${gasSymbol} for gas.` : "Signs after the step above."}
+                          {!account ? "Connect a wallet first." : wrongChain ? "Switch networks first." : shortOfFunds ? "Not enough USDC." : noGas ? `Not enough ${gasSymbol} for gas.` : `Unlocks after step ${si} confirms.`}
                         </span>
                       )}
                     </div>

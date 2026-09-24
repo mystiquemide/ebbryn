@@ -16,22 +16,22 @@ export function hasWallet(): boolean {
 }
 
 export async function connectWallet(): Promise<`0x${string}`> {
-  if (!window.ethereum) throw new WalletError("No browser wallet found. Install one like MetaMask to use your wallet balance.");
+  if (!window.ethereum) throw new WalletError("No browser wallet found. Install one like MetaMask, or type your balance in.");
   try {
     const [account] = (await window.ethereum.request({ method: "eth_requestAccounts" })) as `0x${string}`[];
-    if (!account) throw new WalletError("The wallet didn't share an account.");
+    if (!account) throw new WalletError("Your wallet didn't share an account. Unlock it and try again.");
     return account;
   } catch (e) {
     if (e instanceof WalletError) throw e;
     const code = (e as { code?: number })?.code;
-    throw new WalletError(code === 4001 ? "You declined the connection. Nothing was shared." : "The wallet couldn't connect.");
+    throw new WalletError(code === 4001 ? "You declined the connection. Nothing was shared." : "Your wallet didn't connect. Open it, make sure it's unlocked, and try again.");
   }
 }
 
 // Reads an ERC-20 balance over the chain's public RPC, so it works whatever network the wallet is on.
 export async function readTokenBalance(chainId: number, token: `0x${string}`, owner: `0x${string}`, decimals: number): Promise<number> {
   const chain = chainById(chainId);
-  if (!chain) throw new WalletError(`Ebbryn doesn't know chain ${chainId}.`);
+  if (!chain) throw new WalletError("This vault is on a network Ebbryn doesn't support yet.");
   const client = createPublicClient({ chain, transport: http() });
   const raw = await client.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [owner] });
   return Number(formatUnits(raw, decimals));
@@ -46,14 +46,14 @@ export async function walletChainId(): Promise<number> {
 // Switches the wallet to the chain, adding it first if the wallet doesn't know it.
 export async function switchWalletChain(chainId: number): Promise<void> {
   const chain = chainById(chainId);
-  if (!window.ethereum || !chain) throw new WalletError("Can't switch networks in this wallet.");
+  if (!window.ethereum || !chain) throw new WalletError("This wallet can't switch networks from here. Switch to the vault's network in the wallet itself.");
   const hexId = `0x${chainId.toString(16)}` as `0x${string}`;
   try {
     await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hexId }] });
   } catch (e) {
     const code = (e as { code?: number })?.code;
     if (code === 4001) throw new WalletError("You declined the network switch.");
-    if (code !== 4902) throw new WalletError("The wallet couldn't switch networks.");
+    if (code !== 4902) throw new WalletError("Your wallet didn't switch networks. Switch to the vault's network in the wallet, then try again.");
     await window.ethereum.request({
       method: "wallet_addEthereumChain",
       params: [
@@ -71,7 +71,7 @@ export async function switchWalletChain(chainId: number): Promise<void> {
 
 export async function readAllowance(chainId: number, token: `0x${string}`, owner: `0x${string}`, spender: `0x${string}`): Promise<bigint> {
   const chain = chainById(chainId);
-  if (!chain) throw new WalletError(`Ebbryn doesn't know chain ${chainId}.`);
+  if (!chain) throw new WalletError("This vault is on a network Ebbryn doesn't support yet.");
   const client = createPublicClient({ chain, transport: http() });
   return client.readContract({ address: token, abi: erc20Abi, functionName: "allowance", args: [owner, spender] });
 }
@@ -104,7 +104,7 @@ export async function sendAndConfirm(
 
 export async function readNativeBalance(chainId: number, owner: `0x${string}`): Promise<number> {
   const chain = chainById(chainId);
-  if (!chain) throw new WalletError(`Ebbryn doesn't know chain ${chainId}.`);
+  if (!chain) throw new WalletError("This vault is on a network Ebbryn doesn't support yet.");
   const client = createPublicClient({ chain, transport: http() });
   return Number(formatUnits(await client.getBalance({ address: owner }), chain.nativeCurrency.decimals));
 }

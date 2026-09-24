@@ -14,40 +14,40 @@ const REPEATS: Repeat[] = ["none", "daily", "semimonthly"];
 
 export class InputError extends Error {}
 
-function num(v: unknown, name: string, min: number, max: number): number {
-  if (typeof v !== "number" || !Number.isFinite(v) || v < min || v > max) {
-    throw new InputError(`${name} must be a number between ${min} and ${max}`);
-  }
+function num(v: unknown, min: number, max: number, message: string): number {
+  if (typeof v !== "number" || !Number.isFinite(v) || v < min || v > max) throw new InputError(message);
   return Math.round(v * 100) / 100;
 }
 
-// Validates everything that reaches SERV or the checks. The server sets today, never the client.
 export function parsePlanInputs(body: unknown, today: string): PlanInputs {
-  if (!body || typeof body !== "object") throw new InputError("Body must be a JSON object");
+  if (!body || typeof body !== "object") throw new InputError("Something in the form didn't come through. Refresh the page and try again.");
   const b = body as Record<string, unknown>;
-  const balance = num(b.balance, "balance", 0, 1_000_000_000);
-  if (!Array.isArray(b.payouts) || b.payouts.length === 0 || b.payouts.length > 20) {
-    throw new InputError("payouts must list 1 to 20 payouts");
-  }
-  const ids = new Set<string>();
+  const balance = num(b.balance, 0, 1_000_000_000, "Enter the USDC you hold, as a number.");
+  if (!Array.isArray(b.payouts) || b.payouts.length === 0) throw new InputError("Add at least one payout to plan around.");
+  if (b.payouts.length > 20) throw new InputError("Ebbryn plans up to 20 payouts at a time. Remove a few and try again.");
+  const ids = new Map<string, number>();
   const payouts = b.payouts.map((raw, i): Payout => {
+    const n = i + 1;
     const p = (raw ?? {}) as Record<string, unknown>;
-    const id = typeof p.id === "string" && /^[a-z0-9-]{1,24}$/.test(p.id) ? p.id : null;
-    if (!id || ids.has(id)) throw new InputError(`payouts[${i}].id must be unique, lowercase letters, numbers or dashes`);
-    ids.add(id);
     const label = typeof p.label === "string" ? p.label.trim().slice(0, 60) : "";
-    if (!label) throw new InputError(`payouts[${i}].label is required`);
+    if (!label) throw new InputError(`Give payout ${n} a name.`);
+    const id = typeof p.id === "string" && /^[a-z0-9-]{1,24}$/.test(p.id) ? p.id : null;
+    if (!id) throw new InputError(`Rename payout ${n} using letters and numbers.`);
+    const clash = ids.get(id);
+    if (clash) throw new InputError(`Payouts ${clash} and ${n} have the same name. Rename one so Ebbryn can tell them apart.`);
+    ids.set(id, n);
+    const amount = num(p.amount, 0.01, 1_000_000_000, `Enter an amount above 0 for payout ${n}.`);
     const date = typeof p.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(p.date) ? p.date : null;
-    if (!date) throw new InputError(`payouts[${i}].date must be YYYY-MM-DD`);
+    if (!date) throw new InputError(`Pick a first date for payout ${n}.`);
     const repeat = REPEATS.includes(p.repeat as Repeat) ? (p.repeat as Repeat) : null;
-    if (!repeat) throw new InputError(`payouts[${i}].repeat must be one of ${REPEATS.join(", ")}`);
-    return { id, label, amount: num(p.amount, `payouts[${i}].amount`, 0.01, 1_000_000_000), date, repeat };
+    if (!repeat) throw new InputError(`Choose how often payout ${n} repeats.`);
+    return { id, label, amount, date, repeat };
   });
   const rules = typeof b.rules === "string" ? b.rules.slice(0, 1200) : "";
   const l = (b.limits ?? {}) as Record<string, unknown>;
   const limits: Limits = {
-    maxParkedPct: num(l.maxParkedPct, "limits.maxParkedPct", 0, 100),
-    minLiquidDays: num(l.minLiquidDays, "limits.minLiquidDays", 0, 30),
+    maxParkedPct: num(l.maxParkedPct, 0, 100, `"Park at most" needs a number from 0 to 100.`),
+    minLiquidDays: num(l.minLiquidDays, 0, 30, `"Extra days kept ready" needs a number from 0 to 30.`),
   };
   return { balance, today, payouts, rules, limits };
 }

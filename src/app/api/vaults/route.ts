@@ -6,7 +6,7 @@ export async function GET() {
   try {
     return Response.json({ vaults: await listVaults() });
   } catch (e) {
-    const message = e instanceof IxsError ? e.message : "Could not reach IXS";
-    return Response.json({ error: message }, { status: 502 });
+    console.error(e instanceof IxsError ? e.message : e);
+    return Response.json({ error: "IXS didn't answer in time. Try again in a minute." }, { status: 502 });
   }
 }

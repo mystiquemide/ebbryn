@@ -28,7 +28,7 @@ export async function POST(req: Request) {
   try {
     inputs = parsePlanInputs(await req.json(), new Date().toISOString().slice(0, 10));
   } catch (e) {
-    const message = e instanceof InputError ? e.message : "Body must be valid JSON";
+    const message = e instanceof InputError ? e.message : "Something in the form didn't come through. Refresh the page and try again.";
     return Response.json({ error: message }, { status: 400 });
   }
 
@@ -73,9 +73,14 @@ export async function POST(req: Request) {
     cacheSet(cacheKey, body);
     return Response.json(body);
   } catch (e) {
-    if (e instanceof IxsError) return Response.json({ error: `IXS: ${e.message}` }, { status: 502 });
-    if (e instanceof ServError) return Response.json({ error: `SERV: ${e.message}` }, { status: 502 });
+    // Details stay in server logs. Users get what happened and what to do.
     console.error(e);
-    return Response.json({ error: "Planning failed. Nothing was changed." }, { status: 500 });
+    if (e instanceof IxsError) {
+      return Response.json({ error: "IXS didn't answer in time, so Ebbryn couldn't check the vaults. Nothing was changed. Try again in a minute." }, { status: 502 });
+    }
+    if (e instanceof ServError) {
+      return Response.json({ error: "SERV couldn't finish this plan. Nothing was changed. Try again in a minute." }, { status: 502 });
+    }
+    return Response.json({ error: "This plan didn't finish. Nothing was changed. Try again." }, { status: 500 });
   }
 }

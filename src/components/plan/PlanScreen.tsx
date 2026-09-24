@@ -48,9 +48,11 @@ function Planning({ started }: { started: number }) {
   }, []);
   const s = Math.max(0, Math.floor((now - started) / 1000));
   return (
-    <div className="flex flex-col gap-6 py-6" role="status" aria-live="polite">
+    <div className="flex flex-col gap-6 py-6">
       <p className="label">Planning</p>
-      <h1 className="display-section text-ink">Planning against your rules.</h1>
+      <h1 className="display-section text-ink" role="status">
+        Planning against your rules.
+      </h1>
       <div className="rounded-[16px] bg-cloud p-6" style={{ boxShadow: "var(--shadow-cloud)" }}>
         <svg viewBox="0 0 1000 120" className="h-auto w-full" aria-hidden="true">
           <line x1="0" x2="1000" y1="60" y2="60" stroke="#d4d4d8" />
@@ -64,7 +66,7 @@ function Planning({ started }: { started: number }) {
         </svg>
       </div>
       <p className="text-[16px] text-charcoal">
-        <span className="num text-ink">
+        <span className="num text-ink" aria-live="off">
           {Math.floor(s / 60)}:{String(s % 60).padStart(2, "0")}
         </span>{" "}
         elapsed. SERV is weighing your payouts and rules, then Ebbryn runs its 8 checks. Usually 40 to 70 seconds.
@@ -121,7 +123,7 @@ export function PlanScreen() {
       const res = await fetch("/api/plan", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(inputs) });
       const body = await res.json().catch(() => ({}));
       if (res.status === 429) return setState({ kind: "rate", until: Date.now() + (Number(body.retryAfterSec) || 60) * 1000 });
-      if (!res.ok) return setState({ kind: "error", message: body.error ?? "Planning failed. Nothing was changed." });
+      if (!res.ok) return setState({ kind: "error", message: body.error ?? "This plan didn't finish. Nothing was changed. Try again." });
       const result = body as PlanResult & { cached?: boolean };
       try {
         localStorage.setItem(PLAN_KEY, JSON.stringify(result));

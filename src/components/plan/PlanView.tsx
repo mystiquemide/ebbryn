@@ -201,7 +201,10 @@ export function PlanView({ result, children }: { result: PlanResult; children?: 
                   >
                     {failed ? "×" : "✓"}
                   </span>
-                  <span className="text-[14px] text-ink">{CHECK_PLAIN[code].title}</span>
+                  <span className="text-[14px] text-ink">
+                    <span className="sr-only">{failed ? "Failed: " : "Passed: "}</span>
+                    {CHECK_PLAIN[code].title}
+                  </span>
                 </p>
                 <p className="mt-2 text-[13px] leading-[19px] text-slate">{failed ? details.join(" ") : CHECK_PLAIN[code].meaning}</p>
               </li>

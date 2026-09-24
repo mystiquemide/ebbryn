@@ -64,7 +64,7 @@ describe("checkPlan", () => {
     const twice: Plan = { ...good, liquidFunds: ["payroll@*", "agents@*"] };
     const r = checkPlan(input(twice));
     expect(r.ok).toBe(false);
-    expect(r.failures.find((f) => f.code === "COVER_ONCE")?.detail).toMatch(/Payroll on 2026-10-15 .* funded 2 times/);
+    expect(r.failures.find((f) => f.code === "COVER_ONCE")?.detail).toMatch(/Payroll on Oct 15 .* funded 2 times/);
   });
 
   it("COVER_ONCE: unfunded payouts and unknown refs are rejected", () => {
@@ -106,7 +106,7 @@ describe("recorded SERV output, Sep 24", () => {
     });
     expect(r.ok).toBe(false);
     const cover = r.failures.filter((f) => f.code === "COVER_ONCE").map((f) => f.detail);
-    expect(cover.some((d) => /Payroll on 2026-10-01 .* funded 2 times/.test(d))).toBe(true);
-    expect(cover.some((d) => /not funded, starting with Agent top-up on 2026-09-27/.test(d))).toBe(true);
+    expect(cover.some((d) => /Payroll on Oct 1 .* funded 2 times/.test(d))).toBe(true);
+    expect(cover.some((d) => /not funded, starting with Agent top-up on Sep 27/.test(d))).toBe(true);
   });
 });

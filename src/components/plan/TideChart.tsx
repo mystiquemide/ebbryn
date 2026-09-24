@@ -68,6 +68,37 @@ export function TideChart({ days, balance, start }: { days: Day[]; balance: numb
         <span>{dayLabel(days[n - 1].date)}</span>
       </div>
 
+      <table className="sr-only">
+        <caption>Ready and parked cash on days when money moves</caption>
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">What happens</th>
+            <th scope="col">Ready after</th>
+            <th scope="col">Parked after</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[0, ...marks.map((m) => m.i)]
+            .filter((v, k, a) => a.indexOf(v) === k)
+            .map((i) => (
+              <tr key={i}>
+                <th scope="row">{dayLabel(days[i].date)}</th>
+                <td>
+                  {i === 0
+                    ? "Start"
+                    : marks
+                        .filter((m) => m.i === i)
+                        .map((m) => `${m.kind === "withdraw" ? "Withdraw from vault" : m.label} ${formatUsdc(m.amount)}`)
+                        .join(", ")}
+                </td>
+                <td>{formatUsdc(days[i].ready)}</td>
+                <td>{formatUsdc(days[i].parked)}</td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+
       {marks.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2 border-t border-steel pt-4">
           {marks.map((m, k) => (

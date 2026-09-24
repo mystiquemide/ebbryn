@@ -190,7 +190,7 @@ export function SetupForm() {
           </Link>
           <p className="label">Step 1 of 3</p>
           <h1 className="display-section text-ink">Tell Ebbryn what&apos;s coming up.</h1>
-          <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Start from">
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Start from a template">
             <span className="mr-2 text-[14px] text-slate">Start from</span>
             {(
               [
@@ -202,8 +202,7 @@ export function SetupForm() {
               <button
                 key={k}
                 type="button"
-                role="tab"
-                aria-selected={kind === k}
+                aria-pressed={kind === k}
                 onClick={() => pick(k)}
                 className="btn btn-soft gap-2"
                 style={kind === k ? { background: "#18181b", color: "#ffffff" } : undefined}
