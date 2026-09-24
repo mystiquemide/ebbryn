@@ -1,99 +1,202 @@
 # Ebbryn
 
-Cash that comes back on time. Ebbryn parks the USDC you hold for payroll in IXS vaults and brings it back before payday. SERV plans it, code checks it, and you sign it.
+[![CI](https://github.com/mystiquemide/ebbryn/actions/workflows/ci.yml/badge.svg)](https://github.com/mystiquemide/ebbryn/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
+[![Live demo](https://img.shields.io/badge/demo-ebbryn.vercel.app-94faf0.svg)](https://ebbryn.vercel.app)
 
-Live: https://ebbryn.vercel.app (BSC testnet)
+**Cash that comes back on time.** Ebbryn parks the USDC a business holds for payroll in IXS RWA vaults and brings it back before each payout. SERV plans it, code checks it, and you sign every move.
 
-In testing, SERV kept 8,000 USDC ready for payroll and also scheduled an 8,000 USDC withdrawal for the same payroll. Ebbryn's checks caught it and nothing moved. That is the design: the model proposes, deterministic code decides whether the plan is allowed, and nothing reaches a wallet without your signature.
+Built for the OpenServ SERV Hackathon, Edition 01, RWA Vaults track (partner: IXS Finance).
+
+**Live:** https://ebbryn.vercel.app (BSC testnet)
+
+![Ebbryn landing page](.github/assets/landing.png)
+
+## The problem
+
+Businesses that pay contractors or run AI agents in USDC keep weeks of payouts sitting idle. Holding USDC pays nothing, and US law now bars stablecoin issuers from paying yield on it.
+
+Parking that cash in a yield vault is easy. Getting it back before payday, every time, is the hard part. Redemptions take time, and if the money isn't back when payroll is due, people don't get paid. Today a finance lead works this out by hand in a spreadsheet, or leaves the cash idle.
+
+## The solution
+
+You enter your balance, your upcoming payouts and your cash rules in plain English. Ebbryn asks SERV Reasoning for a plan: how much stays ready in your wallet, how much is parked in an IXS vault, and when to withdraw so the money lands before each payout.
+
+The model is never trusted on its own. In testing, SERV kept 8,000 USDC ready for payroll and also scheduled an 8,000 USDC withdrawal for the same payroll. Ebbryn's checks caught it and nothing moved:
+
+![A SERV plan rejected by Ebbryn's checks](.github/assets/rejected.png)
+
+A plan that passes all eight checks is signed by the server, IXS builds the unsigned transactions, and you sign them in your own wallet. Ebbryn never holds keys or funds.
+
+![A live plan that passed all eight checks](.github/assets/plan.png)
+
+## Try it
+
+No install needed. Open https://ebbryn.vercel.app and:
+
+1. Click **See a real plan** to watch the eight checks reject the recorded SERV plan that counted payroll twice.
+2. Click **Plan my cash**, keep the Payroll team template, and click **Plan my cash** again. A live SERV plan comes back in about 40 seconds to 2 minutes, with a 30-day chart, SERV's reasons and the check results.
+3. Change a rule, for example "keep at least half the balance ready", and plan again. The reasons quote the rule you changed.
+4. Click **Review moves** and connect a browser wallet on BSC testnet. You see the exact approve and deposit you would sign, plus a calendar reminder for each withdrawal date.
+
+Planning uses shared SERV credits, so it's limited to 5 plans per IP every 10 minutes.
 
 ## How it works
 
-You list your payouts and write your cash rules in plain English.
-SERV Reasoning (OpenServ) proposes how much stays ready and how much is parked in IXS vaults, with withdrawal dates.
-Eight checks in code reject any plan that double counts, breaks a hard limit or lands money too late.
-IXS builds the transactions, and you approve and deposit from your own wallet.
+```
+  You                     Ebbryn server                         Sponsors
+  ───                     ─────────────                         ────────
+  balance, payouts,  ──▶  validate inputs
+  rules, limits           read live vaults  ─────────────────▶  IXS REST + MCP
+                          ask for a plan    ─────────────────▶  SERV Reasoning
+                          run 8 checks  (retry once on fail)
+                          HMAC-sign passing plan
+  review plan       ◀──   plan, reasons, check results
+  "Review moves"    ──▶   verify signature, re-check live vaults
+                          build unsigned txs ─────────────────▶  IXS MCP
+  sign in wallet    ◀──   approve + deposit, amounts verified
+       │
+       └──▶ BSC testnet
+```
 
-| Step | Who | What happens |
+| Step | Who decides | What happens |
 |---|---|---|
-| Setup | You | Balance, payouts, plain-English rules, two hard limits (max % parked, extra buffer days) |
-| Plan | SERV | `gpt-6-luna-serv-kronos-multipath` with strict JSON schema and Shadow Agent returns a split and reasons |
-| Check | Ebbryn | 8 checks run on every plan. A failing plan is shown with its failures and moves stay locked |
-| Sign plan | Ebbryn | A passing plan is HMAC-signed so it can't be edited before moves are built |
-| Build | IXS | IXS MCP returns unsigned approve and deposit transactions for the open vault |
-| Sign | You | Approve exactly the deposit amount, then deposit. Later withdrawals are yours to sign too |
+| Setup | You | Balance, payouts (one-off, daily or twice a month), plain-English rules, two hard limits: max % parked and extra buffer days |
+| Plan | SERV | Proposes the ready/parked split, withdrawal dates and a reason for each choice that quotes your rule |
+| Check | Code | Eight deterministic checks. A failing plan goes back to SERV once with the failures. If it still fails, moves stay locked |
+| Seal | Code | A passing plan is HMAC-signed so it can't be edited in the browser before moves are built |
+| Build | IXS | IXS MCP returns unsigned approve and deposit transactions. Ebbryn rejects any transaction aimed at an unexpected contract and checks the approve amount matches the deposit |
+| Sign | You | You sign every transaction, including each later withdrawal |
 
-## Try it in 2 minutes
+The rule of the design: judgment goes to the model, arithmetic goes to code. SERV weighs competing goals like your buffer rules, payout dates and withdrawal lag. Code owns every sum, date and limit.
 
-Live at https://ebbryn.vercel.app (testnet). Planning uses shared SERV credits and is rate limited. Open it, or run it yourself (see the last section), then:
+## Sponsor integrations
 
-1. Open `/` and scroll to "Why code checks the model". It runs the real checks against a recorded SERV plan that counted payroll twice.
-2. Click **Plan my cash**, keep the Payroll team template, click **Plan my cash** again. A live SERV plan comes back in about 40 seconds to 2 minutes with a tide chart, SERV's reasons and 8 check tiles.
-3. Edit a rule, for example "keep at least half the balance ready", and plan again. The reasons quote the rule you changed.
-4. Click **View a plan Ebbryn rejected** to see the recorded failure with moves locked.
-5. Click **Review moves**, connect a browser wallet on BSC testnet, and see the exact approve and deposit Ebbryn would ask you to sign, with balance, gas and network checks.
+### SERV Reasoning (OpenServ)
+
+| What | Detail |
+|---|---|
+| Endpoint | `https://inference-api.openserv.ai/v1/chat/completions` via the OpenAI SDK, in [`src/lib/serv.ts`](src/lib/serv.ts) |
+| Model | `gpt-6-luna-serv-kronos-multipath` |
+| Kronos + Multipath | The planning problem has branches: fund a payout from ready cash, or park it and withdraw in time. Multipath explores those options against your rules |
+| Shadow Agent | The `serv_shadow_agent` tool reviews the draft before it's returned, with a hint that restates the funding rules |
+| Structured output | Strict `json_schema`, so every plan has the same shape and every reason names the rule it follows |
+| Prompt caching | The system prompt is static and your rules go in the user message, so SERV can reuse its generated reasoning prompt |
+| Traceability | Every plan shows its SERV request id |
+
+API notes from building: a system message is required, `temperature` isn't supported, and the limit is `max_completion_tokens`. A 402 means the credit balance is too low, and Ebbryn shows a plain "planning is paused" message.
+
+### IXS Finance
+
+| What | Detail |
+|---|---|
+| Vault discovery | REST `GET https://api-dev-v2.ixs.finance/vaults`, in [`src/lib/ixs.ts`](src/lib/ixs.ts) |
+| Vault details | MCP `vault_get` for settlement type (instant or by request) |
+| Deposits open? | MCP `vault_build_request_deposit` with a probe address. If IXS refuses, the vault is marked paused and SERV can't park there |
+| Transactions | MCP `vault_build_request_deposit` for the real approve and deposit, in base units |
+| Target vault | IXHYB - BSC `0xCb09a5326AEFD705d14FF4C5ca2beD7086ba0Dcc`, BSC testnet (chain 97), withdraw anytime |
+
+Found while building and reported in [IXS-Finance/ixs-rwa-agent-skills#5](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5): the Avalanche and Arc vaults accept no deposits, `vault_request_status` errors, parallel MCP calls hang, and `vaults_list` returns a subset. Ebbryn queues MCP calls one at a time, retries once on timeout, and reads discovery from REST.
+
+## The eight checks
+
+Every plan runs through [`src/lib/check.ts`](src/lib/check.ts). One failure locks moves.
+
+| Check | Rule |
+|---|---|
+| `SUM` | Ready plus parked equals the balance |
+| `CAP` | Nothing parked above your hard limit, even if your rules text asks for more |
+| `CLOSED` | Money only goes into vaults taking deposits right now |
+| `COVER_ONCE` | Every payout is funded exactly once, never twice and never skipped |
+| `LIQUID_COVER` | Ready cash covers the payouts it funds plus your buffer days |
+| `TIMING` | Each withdrawal lands at least a day before the payout it funds |
+| `REDEEM_LE_PARKED` | You never withdraw more than you parked |
+| `SHORTFALL` | If payouts exceed the balance, nothing is parked |
 
 ## Proof
 
-| Case | Outcome | Proof |
+| Case | Result | Evidence |
 |---|---|---|
-| SERV counts the same payroll twice | Rejected by `COVER_ONCE` and `LIQUID_COVER`, 2 failed and 6 passed, nothing signable | [`src/fixtures/serv-double-count.json`](src/fixtures/serv-double-count.json), [`check.test.ts`](src/lib/check.test.ts) |
-| SERV plan that should pass | 8 of 8 checks, 81,600 ready, 46,800 parked, 42,000 withdrawn Oct 14 for the Oct 15 payroll | SERV request `0520d265-1c98-4539-98f3-d0cf7f4d3173`, [`src/fixtures/serv-plan-payroll.json`](src/fixtures/serv-plan-payroll.json) |
-| Same plan on the live URL | 8 of 8 checks on the first attempt, signed | SERV request `4e20751a-7866-4b12-ac69-4fa3eec5aca8` |
-| Rules text says "park 100%" | `CAP` fails, hard limits win over the rules | [`check.test.ts`](src/lib/check.test.ts) |
-| Plan edited in the browser before signing | `/api/moves` returns 400, no transactions built | [`guard.test.ts`](src/lib/guard.test.ts), [`src/app/api/moves/route.ts`](src/app/api/moves/route.ts) |
-| Planning spammed from one IP | 429 after 5 plans in 10 minutes, daily cap 200, counted in Redis across server instances | [`guard.test.ts`](src/lib/guard.test.ts), [`ratelimit.ts`](src/lib/ratelimit.ts) |
-| Amount conversion | 75,600 USDC becomes `75600000000` base units, no float error | [`units.test.ts`](src/lib/units.test.ts) |
-| Tide chart honesty | Wallet never negative, ready + parked + paid always equals the balance | [`timeline.test.ts`](src/lib/timeline.test.ts) |
-| IXS approve amount | Decoded from the real IXS `approve` call and matched to the deposit before the UI says "exactly" | [`src/lib/wallet.ts`](src/lib/wallet.ts) `decodeApprove` |
-| IXS returns a transaction for another contract | Blocked, nothing to sign | [`src/app/api/moves/route.ts`](src/app/api/moves/route.ts) |
+| SERV counts the same payroll twice | Rejected by `COVER_ONCE` and `LIQUID_COVER`, moves locked | [`serv-double-count.json`](src/fixtures/serv-double-count.json), [`check.test.ts`](src/lib/check.test.ts) |
+| Payroll plan on the live URL | 8 of 8 on the first attempt: 81,600 ready, 46,801 parked, 42,000 withdrawn Oct 14 for the Oct 15 payroll | SERV request `4e20751a-7866-4b12-ac69-4fa3eec5aca8` |
+| Rules text says "park 100%" | `CAP` fails, hard limits win | [`check.test.ts`](src/lib/check.test.ts) |
+| Plan edited in the browser | `/api/moves` returns 400, nothing built | [`guard.test.ts`](src/lib/guard.test.ts) |
+| Planning spammed from one IP | 429 after 5 plans in 10 minutes, 200 a day, counted in Redis across server instances | [`guard.test.ts`](src/lib/guard.test.ts), [`ratelimit.ts`](src/lib/ratelimit.ts) |
+| Chart honesty | Wallet never negative, ready + parked + paid always equals the balance | [`timeline.test.ts`](src/lib/timeline.test.ts) |
+| USDC conversion | 75,600 USDC becomes `75600000000` base units with no float error | [`units.test.ts`](src/lib/units.test.ts) |
 
-## Live integrations
+Lint, typecheck, 37 tests and a production build run on every push in [CI](.github/workflows/ci.yml).
 
-| Integration | Where | Status |
-|---|---|---|
-| SERV Reasoning API | `https://inference-api.openserv.ai/v1`, called from [`src/lib/serv.ts`](src/lib/serv.ts) | Live, request ids above |
-| IXS vault discovery | `https://api-dev-v2.ixs.finance/vaults` | Live |
-| IXS MCP | `https://api-dev-v2.ixs.finance/mcp`, `vault_get`, `vault_build_request_deposit` | Live |
-| Target vault | IXHYB - BSC `0xCb09a5326AEFD705d14FF4C5ca2beD7086ba0Dcc`, BSC testnet (97), settles instantly | Open for deposits |
-| Test wallet | `0xF4905CfAd9AEf6fbB1B11A82C76905f6e73842E8` | 0.01 test BNB, 0 IXS test USDC |
-
-Things found and reported to IXS while building, in [IXS-Finance/ixs-rwa-agent-skills#5](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5): the Arc and Fuji vaults accept no deposits, `vault_request_status` errors, parallel MCP calls hang, and `vaults_list` returns a subset. Ebbryn queues MCP calls one at a time and reads discovery from REST because of this.
-
-## How this differs
-
-| Alternative | What it does | Why Ebbryn is different |
-|---|---|---|
-| Earn features in wallets and neobanks | Park a balance at a single rate | Ebbryn plans around your payout dates and brings money back before each one |
-| Payroll platforms with built-in yield | Yield on float inside one platform | Works with any USDC wallet and any payout schedule you type in |
-| Agent wallets with threshold sweeping | Move balance above a threshold | Ebbryn reasons over dates and rules, and code checks every plan |
-| "AI treasury" agents | A model decides and executes | The model only proposes. Code gates it and you sign every transaction |
+![Moves screen with the exact deposit and a withdrawal reminder](.github/assets/moves.png)
 
 ## Business model
 
-Ebbryn keeps 15% of the yield it earns for a customer and charges nothing when it earns nothing. 500,000 USDC parked at 6% earns 30,000 USDC a year, and Ebbryn keeps 4,500. A second line is a referral share from IXS for new vault deposits. There is no billing in this build.
+Ebbryn keeps 15% of the yield it earns for a customer and charges nothing when it earns nothing. 500,000 USDC parked at 6% earns 30,000 USDC a year, and Ebbryn keeps 4,500. A second line is a referral share from IXS on new vault deposits.
 
-## Honest limitations
+First customers: non-US companies paying 10 to 50 contractors in USDC, and operators running fleets of AI agents that need daily wallet top-ups.
 
-- Unaudited hackathon code. Testnet only. Don't use it with real funds.
-- Awaiting sponsor test funds. The IXS test USDC can only be minted by IXS, and the request is open in issue #5. The approve and deposit are built by IXS and checked, but not broadcast yet.
-- Withdrawals are planned, not automated. On the withdrawal date you come back and sign it. Each withdrawal has an "Add to calendar" reminder.
-- SERV plans take about 40 seconds to 2 minutes. Identical inputs within 10 minutes reuse the last plan.
-- Mainnet IXS vaults require IXS verification (KYC). Only testnet vaults are used here.
-- The plan cache is in memory and resets when the server restarts.
-- Your setup and plans live in your browser's local storage. There are no accounts.
+## Limitations
 
-## What's real
+- Hackathon code, unaudited, testnet only. Don't use it with real funds.
+- Awaiting sponsor test funds. IXS test USDC can only be minted by IXS, and the request is open in issue #5. The approve and deposit are built by IXS and checked, but not broadcast yet.
+- Withdrawals are planned, not automated. You come back on the date and sign, with an "Add to calendar" reminder.
+- Mainnet IXS vaults require IXS verification (KYC).
+- Setup and plans are stored in your browser. There are no accounts.
 
-The SERV and IXS calls are real and there is no mock data in the app. The only recorded data is the SERV plan that failed its checks and one that passed, both labelled as recorded wherever they appear, plus a committed snapshot of the IXS vault list shown only when IXS is unreachable, with its timestamp. The model proposes, and the eight checks in [`src/lib/check.ts`](src/lib/check.ts) decide. 37 tests pass with `npm test`.
+## Run it locally
 
-## Run locally
+Requires Node.js 22 and a SERV API key from [console.openserv.ai](https://console.openserv.ai).
 
 ```bash
 git clone https://github.com/mystiquemide/ebbryn.git && cd ebbryn
 npm install
-cp .env.example .env.local   # set SERV_API_KEY and a 32+ character PLAN_SIGNING_SECRET
+cp .env.example .env.local   # then fill in the values below
 npm test
-npm run build && npm start
+npm run dev                  # http://localhost:3000
 ```
 
-Built on SERV Reasoning by OpenServ and IXS vaults.
+| Variable | Required | Purpose |
+|---|---|---|
+| `SERV_API_KEY` | Yes | SERV Reasoning API key |
+| `PLAN_SIGNING_SECRET` | Yes | 32+ characters, signs passing plans |
+| `SERV_MODEL` | No | Defaults to `gpt-6-luna-serv-kronos-multipath` |
+| `IXS_MCP_URL` | No | Defaults to the IXS testnet MCP |
+| `NEXT_PUBLIC_BSC_TESTNET_RPC` | No | RPC for balance and allowance reads |
+| `KV_REST_API_URL`, `KV_REST_API_TOKEN` | No | Upstash Redis for shared rate limits. Falls back to in-memory |
+
+The API can be used without the UI:
+
+```bash
+# Live IXS vaults and whether each accepts deposits
+curl http://localhost:3000/api/vaults
+
+# Ask for a checked plan
+curl -X POST http://localhost:3000/api/plan -H 'content-type: application/json' -d '{
+  "balance": 128400, "today": "2026-09-24",
+  "payouts": [
+    {"id": "payroll", "label": "Contractor payroll", "amount": 42000, "date": "2026-10-01", "repeat": "semimonthly"},
+    {"id": "agents", "label": "Agent fleet top-up", "amount": 1200, "date": "2026-09-24", "repeat": "daily"}
+  ],
+  "rules": "Never be short for payroll. Keep 3 days of agent spend ready.",
+  "limits": {"maxParkedPct": 60, "minLiquidDays": 3}
+}'
+```
+
+`POST /api/moves` takes the signed plan plus a wallet address and returns the unsigned IXS transactions.
+
+## Project structure
+
+```
+src/
+  app/            pages (landing, setup, plan, moves) and API routes (plan, moves, vaults)
+  components/     UI, including the tide chart and wallet flow
+  lib/            serv.ts, ixs.ts, check.ts, sign.ts, ratelimit.ts, schedule.ts, timeline.ts, wallet.ts
+  fixtures/       recorded SERV plans, one rejected and one passing
+  data/           IXS vault snapshot shown only when IXS is unreachable
+```
+
+Built with Next.js 16, React 19, Tailwind CSS 4, viem, the OpenAI SDK pointed at SERV, and Vitest.
+
+## License
+
+[MIT](LICENSE)
