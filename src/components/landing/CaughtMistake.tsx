@@ -1,18 +1,9 @@
 import recorded from "@/fixtures/serv-double-count.json";
 import { checkPlan } from "@/lib/check";
+import { CHECK_PLAIN } from "@/lib/checkCopy";
 import type { Plan, VaultInfo } from "@/lib/plan";
 import { expandSchedule, type Payout } from "@/lib/schedule";
 
-const PLAIN: Record<string, string> = {
-  COVER_ONCE: "Every payout funded exactly once",
-  LIQUID_COVER: "Enough cash kept ready",
-  SUM: "Amounts add up",
-  CAP: "Hard limit respected",
-  CLOSED: "No closed vaults",
-  TIMING: "Money back in time",
-  REDEEM_LE_PARKED: "Can't withdraw more than parked",
-  SHORTFALL: "No shortfall",
-};
 
 // Runs the real checks on the real recorded SERV output. Nothing on this card is typed by hand.
 function runRecorded() {
@@ -91,7 +82,7 @@ export function CaughtMistake() {
                     <span className="grid h-5 w-5 place-items-center rounded-[6px] bg-alert text-[12px] text-paper" aria-hidden="true">
                       ×
                     </span>
-                    <span className="text-[15px] text-paper">{PLAIN[f.code] ?? f.code}</span>
+                    <span className="text-[15px] text-paper">{CHECK_PLAIN[f.code].title}</span>
                     <span className="num ml-auto text-[11px] text-white/55">{f.code}</span>
                   </p>
                   <ul className="mt-2 flex flex-col gap-1">
@@ -108,7 +99,7 @@ export function CaughtMistake() {
               {result.passed.map((c) => (
                 <span key={c} className="inline-flex items-center gap-2">
                   <span className="h-[6px] w-4 rounded-full bg-volt" aria-hidden="true" />
-                  {PLAIN[c] ?? c}
+                  {CHECK_PLAIN[c].title}
                 </span>
               ))}
             </p>

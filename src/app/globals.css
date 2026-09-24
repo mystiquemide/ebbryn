@@ -205,3 +205,23 @@ body {
     animation: none;
   }
 }
+
+/* Planning indicator: the tide line draws itself on a loop. */
+@keyframes tide-draw {
+  from {
+    stroke-dashoffset: 1400;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.tide-draw {
+  stroke-dasharray: 1400;
+  animation: tide-draw 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tide-draw {
+    animation: none;
+    stroke-dasharray: none;
+  }
+}

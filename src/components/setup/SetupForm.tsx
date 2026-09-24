@@ -6,12 +6,13 @@ import { useEffect, useId, useMemo, useState } from "react";
 import { InputError, parsePlanInputs, WINDOW_DAYS } from "@/lib/input";
 import type { VaultInfo } from "@/lib/plan";
 import { dailySpend, expandSchedule, type Repeat } from "@/lib/schedule";
-import { STORAGE_KEY, slug, template, type SetupState } from "@/lib/templates";
+import { INPUTS_KEY, SETUP_KEY as STORAGE_KEY } from "@/lib/storageKeys";
+import { slug, template, type SetupState } from "@/lib/templates";
 import { formatUsdc } from "@/lib/units";
 import { connectWallet, readTokenBalance, WalletError } from "@/lib/wallet";
 import { Arrow } from "../SiteNav";
 
-export const INPUTS_KEY = "ebbryn.inputs.v1";
+
 
 type Kind = "payroll" | "fleet" | "blank";
 

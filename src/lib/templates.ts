@@ -8,8 +8,6 @@ export type SetupState = {
   limits: { maxParkedPct: string; minLiquidDays: string };
 };
 
-export const STORAGE_KEY = "ebbryn.setup.v1";
-
 export const DEFAULT_RULES =
   "Never be short for payroll. Keep 3 days of agent spend ready. Park the rest, but keep at least half the balance ready.";
 

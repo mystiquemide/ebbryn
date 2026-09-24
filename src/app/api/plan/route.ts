@@ -1,7 +1,7 @@
 import { checkPlan } from "@/lib/check";
 import { InputError, parsePlanInputs, WINDOW_DAYS, type PlanInputs } from "@/lib/input";
 import { IxsError, listVaults } from "@/lib/ixs";
-import type { CheckResult, Plan } from "@/lib/plan";
+import type { CheckResult, Plan, VaultInfo } from "@/lib/plan";
 import { cacheGet, cacheSet, takePlanSlot } from "@/lib/ratelimit";
 import { expandSchedule } from "@/lib/schedule";
 import { requestPlan, ServError, type ServMeta } from "@/lib/serv";
@@ -16,6 +16,7 @@ export type PlanResponse = {
   attempts: number;
   meta: ServMeta;
   signature: string | null;
+  vaults: VaultInfo[];
 };
 
 function clientIp(req: Request): string {
@@ -67,6 +68,7 @@ export async function POST(req: Request) {
       attempts,
       meta,
       signature: check.ok ? signPayload({ inputs, plan }) : null,
+      vaults,
     };
     cacheSet(cacheKey, body);
     return Response.json(body);
