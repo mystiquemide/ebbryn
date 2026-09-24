@@ -43,20 +43,28 @@ Planning uses shared SERV credits, so it's limited to 5 plans per IP every 10 mi
 
 ## How it works
 
-```
-  You                     Ebbryn server                         Sponsors
-  ───                     ─────────────                         ────────
-  balance, payouts,  ──▶  validate inputs
-  rules, limits           read live vaults  ─────────────────▶  IXS REST + MCP
-                          ask for a plan    ─────────────────▶  SERV Reasoning
-                          run 8 checks  (retry once on fail)
-                          HMAC-sign passing plan
-  review plan       ◀──   plan, reasons, check results
-  "Review moves"    ──▶   verify signature, re-check live vaults
-                          build unsigned txs ─────────────────▶  IXS MCP
-  sign in wallet    ◀──   approve + deposit, amounts verified
-       │
-       └──▶ BSC testnet
+```mermaid
+sequenceDiagram
+    actor You
+    participant App as Ebbryn server
+    participant IXS as IXS REST + MCP
+    participant SERV as SERV Reasoning
+    participant Chain as BSC testnet
+
+    You->>App: Balance, payouts, rules, hard limits
+    App->>IXS: Read live vaults and which accept deposits
+    App->>SERV: Ask for a plan
+    SERV-->>App: Ready/parked split, withdrawal dates, reasons
+    App->>App: Run 8 checks, retry SERV once on failure
+    App->>App: HMAC-sign the passing plan
+    App-->>You: Plan, reasons, check results
+    You->>App: Review moves
+    App->>App: Verify signature, re-check live vaults
+    App->>IXS: Build unsigned approve and deposit
+    IXS-->>App: Transactions
+    App->>App: Verify contract and approve amount
+    App-->>You: Exact transactions to sign
+    You->>Chain: Sign and send from your own wallet
 ```
 
 | Step | Who decides | What happens |
