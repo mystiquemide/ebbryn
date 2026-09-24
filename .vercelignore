@@ -1,5 +1,5 @@
-docs
-memory.md
+/docs
+/memory.md
 .env*
 !.env.example
 AGENTS.md
