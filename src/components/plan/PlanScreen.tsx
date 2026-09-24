@@ -227,7 +227,7 @@ export function PlanScreen() {
               </div>
             )}
           </div>
-          {state.cached && <p className="text-[12px] text-slate">Same inputs as a plan from the last 10 minutes, so this is that plan.</p>}
+          {state.cached && <p className="text-[12px] text-slate">These inputs match a plan made in the last 10 minutes, so Ebbryn reused that plan instead of asking SERV again.</p>}
         </PlanView>
       );
     }

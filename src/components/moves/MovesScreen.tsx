@@ -295,8 +295,16 @@ export function MovesScreen() {
         {account && moves[0] && (
           <dl className="num grid grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 border-t border-steel pt-4 text-[13px]">
             {[
-              ["USDC", balance === null ? "Reading" : formatUsdc(balance), balance !== null && !shortOfFunds],
-              [`${gasSymbol} for gas`, gas === null ? "Reading" : gas.toFixed(4), gas !== null && !noGas],
+              [
+                "USDC",
+                balance === null ? "Reading" : shortOfFunds ? `${formatUsdc(balance)} of ${formatUsdc(need)} needed` : `${formatUsdc(balance)} available`,
+                balance !== null && !shortOfFunds,
+              ],
+              [
+                "Gas",
+                gas === null ? "Reading" : noGas ? `${gas.toFixed(4)} ${gasSymbol}, needs ${MIN_GAS}` : `Available, ${gas.toFixed(4)} ${gasSymbol}`,
+                gas !== null && !noGas,
+              ],
               ["Network", wrongChain ? "Other network" : networkCopy(moves[0].network), !wrongChain && chainId !== null],
             ].map(([label, value, ok]) => (
               <div key={String(label)} className="contents">
@@ -313,6 +321,12 @@ export function MovesScreen() {
               </div>
             ))}
           </dl>
+        )}
+        {account && moves[0] && !wrongChain && !shortOfFunds && !noGas && balance !== null && gas !== null && !allDone && (
+          <p className="flex items-center gap-2 text-[14px] text-ink">
+            <span className="grid h-5 w-5 place-items-center rounded-[6px] bg-volt text-[12px]" aria-hidden="true">✓</span>
+            All set. Approve, then deposit.
+          </p>
         )}
       </section>
       {walletMsg && <p className="-mt-4 text-[14px] text-alert">{walletMsg}</p>}
@@ -344,7 +358,7 @@ export function MovesScreen() {
       )}
 
       {noGas && !allDone && moves[0] && (
-        <p className="rounded-[12px] p-4 text-[15px] text-ink" style={{ boxShadow: "inset 0 0 0 1px #b3261e" }}>
+        <p className="-mt-4 rounded-[12px] bg-cloud px-4 py-3 text-[14px] text-charcoal">
           This wallet has {gas!.toFixed(4)} {gasSymbol} on {networkCopy(moves[0].network)}. It needs a little {gasSymbol} to pay network fees for both steps.
         </p>
       )}
