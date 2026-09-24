@@ -4,6 +4,7 @@ import { Hero } from "@/components/landing/Hero";
 import { IdleCash } from "@/components/landing/IdleCash";
 import { CaughtMistake } from "@/components/landing/CaughtMistake";
 import { HowItWorks } from "@/components/landing/HowItWorks";
+import { BuiltOn } from "@/components/landing/BuiltOn";
 import { WhoItsFor } from "@/components/landing/WhoItsFor";
 import { Vaults } from "@/components/landing/Vaults";
 import { FinalCta } from "@/components/landing/FinalCta";
@@ -19,6 +20,7 @@ export default function Home() {
         <IdleCash />
         <CaughtMistake />
         <HowItWorks />
+        <BuiltOn />
         <WhoItsFor />
         <Vaults />
         <FinalCta />
