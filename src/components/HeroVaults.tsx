@@ -56,6 +56,9 @@ function Stack({ sheets, status }: { sheets: Sheet[]; status: string }) {
             </linearGradient>
           </defs>
           <path d="M20 22 C 20 50, 52 42, 52 66" fill="none" stroke="url(#sweep)" strokeWidth="0.6" vectorEffect="non-scaling-stroke" style={{ strokeWidth: 2 }} />
+          {/* Money on the move: a short dark segment runs the sweep from Ebbryn to the vault. The box keeps the
+              viewBox aspect, so plain SVG units scale evenly and the dash math stays exact. */}
+          <path className="flow-packet" d="M20 22 C 20 50, 52 42, 52 66" fill="none" stroke="#18181b" strokeLinecap="round" strokeWidth={0.6} />
         </svg>
 
         <div
@@ -65,8 +68,8 @@ function Stack({ sheets, status }: { sheets: Sheet[]; status: string }) {
           <TideMark size={44} />
         </div>
 
-        {front ? <SheetCard s={front} className="order-2 lg:bottom-[8%] lg:left-[18%] lg:z-10" /> : <EmptyCard className="order-2 lg:bottom-[8%] lg:left-[18%]" />}
-        {back ? <SheetCard s={back} className="order-3 lg:right-[6%] lg:top-[10%]" /> : <EmptyCard className="order-3 lg:right-[6%] lg:top-[10%]" />}
+        {front ? <SheetCard s={front} className="fade-up order-2 [--d:650ms] lg:bottom-[8%] lg:left-[18%] lg:z-10" /> : <EmptyCard className="order-2 lg:bottom-[8%] lg:left-[18%]" />}
+        {back ? <SheetCard s={back} className="fade-up order-3 [--d:500ms] lg:right-[6%] lg:top-[10%]" /> : <EmptyCard className="order-3 lg:right-[6%] lg:top-[10%]" />}
       </div>
       <figcaption className="num mt-3 text-center text-[12px] uppercase tracking-[0.24px] text-slate">{status}</figcaption>
     </figure>

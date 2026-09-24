@@ -23,7 +23,7 @@ const short = (iso: string) =>
 
 function CardFrame({ title, children, footer }: { title: string; children: React.ReactNode; footer: string }) {
   return (
-    <figure className="overflow-hidden rounded-[16px] border border-steel bg-paper" style={{ boxShadow: "var(--shadow-cloud)" }}>
+    <figure data-reveal className="overflow-hidden rounded-[16px] border border-steel bg-paper" style={{ boxShadow: "var(--shadow-cloud)" }}>
       <figcaption className="flex items-center justify-between border-b border-steel px-5 py-3">
         <span className="num text-[12px] uppercase tracking-[0.24px] text-charcoal">{title}</span>
         <span className="num text-[12px] text-slate">{real.label}</span>
@@ -72,7 +72,7 @@ export function PayrollRunway() {
             <span className="text-[12px] text-slate">in your wallet</span>
           </div>
           <div className="relative h-2 rounded-full bg-cloud">
-            <div className="absolute inset-y-0 left-0 rounded-full bg-ink" style={{ width: "100%" }} />
+            <div className="grow-x absolute inset-y-0 left-0 rounded-full bg-ink" style={{ width: "100%" }} />
           </div>
         </div>
         <div className="grid gap-2">
@@ -81,9 +81,9 @@ export function PayrollRunway() {
             <span className="text-[12px] text-slate">{vault?.name}</span>
           </div>
           <div className="relative h-2 rounded-full bg-cloud">
-            <div className="absolute inset-y-0 left-0 rounded-full bg-aqua" style={{ width: pos(redemption.requestDate) }} />
+            <div className="grow-x absolute inset-y-0 left-0 rounded-full bg-aqua" style={{ width: pos(redemption.requestDate), transitionDelay: "0.55s" }} />
             <span
-              className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-ink bg-paper"
+              className="pop absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-ink bg-paper"
               style={{ left: pos(redemption.requestDate) }}
               aria-hidden="true"
             />

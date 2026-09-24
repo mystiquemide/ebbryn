@@ -33,7 +33,7 @@ export function CaughtMistake() {
     <section id="caught" className="scroll-mt-8 bg-ink" aria-labelledby="caught-heading">
       <div className="container-page py-20 md:py-28">
         <p className="label text-white/55">Why code checks the model</p>
-        <h2 id="caught-heading" className="display-section mt-5 max-w-[980px]" style={{ color: "rgba(255,255,255,0.5)" }}>
+        <h2 id="caught-heading" data-reveal className="display-section mt-5 max-w-[980px]" style={{ color: "rgba(255,255,255,0.5)" }}>
           We asked a model to plan payroll cash. <span className="text-paper">It counted payroll twice.</span>
         </h2>
         <p className="mt-5 max-w-[600px] text-[18px] leading-[27px]" style={{ color: "rgba(255,255,255,0.6)" }}>
@@ -42,7 +42,7 @@ export function CaughtMistake() {
         </p>
 
         <div className="mt-12 grid gap-4 lg:grid-cols-2">
-          <figure className="rounded-[16px] bg-graphite p-6 md:p-8" style={{ boxShadow: "var(--shadow-graphite)" }}>
+          <figure data-reveal className="rounded-[16px] bg-graphite p-6 md:p-8" style={{ boxShadow: "var(--shadow-graphite)" }}>
             <figcaption className="flex flex-wrap items-center justify-between gap-2">
               <span className="num text-[12px] uppercase tracking-[0.24px] text-white/55">What SERV said</span>
               <span className="num text-[12px] text-white/55">{recorded.label}</span>
@@ -68,7 +68,7 @@ export function CaughtMistake() {
             <p className="num mt-6 text-[12px] text-white/55">{recorded.model}</p>
           </figure>
 
-          <figure className="rounded-[16px] bg-graphite p-6 md:p-8" style={{ boxShadow: "var(--shadow-graphite)" }}>
+          <figure data-reveal className="rounded-[16px] bg-graphite p-6 md:p-8" style={{ boxShadow: "var(--shadow-graphite)", "--d": "200ms" } as React.CSSProperties}>
             <figcaption className="flex flex-wrap items-center justify-between gap-2">
               <span className="num text-[12px] uppercase tracking-[0.24px] text-white/55">What Ebbryn&apos;s checks found</span>
               <span className="num text-[12px] text-white/55">
@@ -76,8 +76,12 @@ export function CaughtMistake() {
               </span>
             </figcaption>
             <ul className="mt-6 flex flex-col gap-3">
-              {failed.map((f) => (
-                <li key={f.code} className="rounded-[12px] bg-white/[0.04] p-4" style={{ boxShadow: "inset 0 0 0 1px rgba(179,38,30,0.6)" }}>
+              {failed.map((f, k) => (
+                <li
+                  key={f.code}
+                  className="stamp rounded-[12px] bg-white/[0.04] p-4"
+                  style={{ boxShadow: "inset 0 0 0 1px rgba(179,38,30,0.6)", "--d": `${900 + k * 350}ms` } as React.CSSProperties}
+                >
                   <p className="flex items-center gap-2">
                     <span className="grid h-5 w-5 place-items-center rounded-[6px] bg-alert text-[12px] text-paper" aria-hidden="true">
                       ×

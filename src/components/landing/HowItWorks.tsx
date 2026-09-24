@@ -31,13 +31,18 @@ export function HowItWorks() {
     <section id="how" className="scroll-mt-8" aria-labelledby="how-heading">
       <div className="container-page py-20 md:py-28">
         <p className="label">How it works</p>
-        <h2 id="how-heading" className="display-section mt-5 max-w-[1120px] text-ink">
+        <h2 id="how-heading" data-reveal className="display-section mt-5 max-w-[1120px] text-ink">
           Three steps. You stay in control of every one.
         </h2>
 
         <ol className="mt-12 grid gap-4 md:grid-cols-3">
-          {STEPS.map((s) => (
-            <li key={s.n} className="flex flex-col gap-4 rounded-[16px] bg-cloud p-6 md:p-8" style={{ boxShadow: "var(--shadow-cloud)" }}>
+          {STEPS.map((s, i) => (
+            <li
+              key={s.n}
+              data-reveal
+              className="lift flex flex-col gap-4 rounded-[16px] bg-cloud p-6 md:p-8"
+              style={{ boxShadow: "var(--shadow-cloud)", "--d": `${i * 140}ms` } as React.CSSProperties}
+            >
               <div className="flex items-center justify-between">
                 <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-graphite">
                   <svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true">
@@ -55,8 +60,8 @@ export function HowItWorks() {
         <div className="mt-12 grid gap-8 border-t border-steel pt-10 md:grid-cols-[1fr_2fr]">
           <p className="text-[18px] leading-[27px] text-ink">What the checks guarantee, on every plan:</p>
           <ul className="grid gap-4 sm:grid-cols-2">
-            {GUARANTEES.map((g) => (
-              <li key={g} className="flex items-start gap-3 text-[16px] leading-[22px] text-ink">
+            {GUARANTEES.map((g, i) => (
+              <li key={g} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className="flex items-start gap-3 text-[16px] leading-[22px] text-ink">
                 <span className="mt-[1px] grid h-5 w-5 shrink-0 place-items-center rounded-[6px] bg-aqua" aria-hidden="true">
                   <svg width="12" height="12" viewBox="0 0 16 16">
                     <path d="M3 8.5 6.5 12 13 4.5" fill="none" stroke="#18181b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

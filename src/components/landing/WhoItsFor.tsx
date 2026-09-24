@@ -23,7 +23,7 @@ export function WhoItsFor() {
       <div className="container-page flex flex-col gap-16 py-16 md:gap-24 md:py-24">
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <PayrollRunway />
-          <div>
+          <div data-reveal style={{ "--d": "120ms" } as React.CSSProperties}>
             <p className="label">Payroll teams</p>
             <h2 className="feature-heading mt-5 max-w-[520px] text-ink">Pay contractors in USDC? Your float can work until payday.</h2>
             <p className="mt-5 max-w-[520px] text-[16px] leading-[24px] text-charcoal">
@@ -35,7 +35,7 @@ export function WhoItsFor() {
         </div>
 
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="order-2 lg:order-1">
+          <div data-reveal className="order-2 lg:order-1">
             <p className="label">Agent operators</p>
             <h2 className="feature-heading mt-5 max-w-[520px] text-ink">Keep every agent funded. Put the rest to work.</h2>
             <p className="mt-5 max-w-[520px] text-[16px] leading-[24px] text-charcoal">

@@ -8,6 +8,7 @@ import { BuiltOn } from "@/components/landing/BuiltOn";
 import { WhoItsFor } from "@/components/landing/WhoItsFor";
 import { Vaults } from "@/components/landing/Vaults";
 import { FinalCta } from "@/components/landing/FinalCta";
+import { RevealObserver } from "@/components/motion/RevealObserver";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,7 @@ export default function Home() {
         <FinalCta />
       </main>
       <SiteFooter />
+      <RevealObserver />
     </>
   );
 }

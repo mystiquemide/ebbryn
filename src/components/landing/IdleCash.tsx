@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { CountUp } from "../motion/CountUp";
 
 function parse(v: string): number | null {
   const n = Number(v.replace(/,/g, "").trim());
@@ -61,14 +62,14 @@ export function IdleCash() {
   return (
     <section className="container-page py-20 md:py-28" aria-labelledby="idle-heading">
       <p className="label">Idle cash</p>
-      <h2 id="idle-heading" className="display-section mt-5 max-w-[980px] text-ink">
+      <h2 id="idle-heading" data-reveal className="display-section mt-5 max-w-[980px] text-ink">
         Money waiting for payday earns nothing.
       </h2>
       <p className="mt-5 max-w-[560px] text-[18px] leading-[27px] text-slate">
         USDC sitting idle doesn&apos;t earn yield on its own. Put in your own numbers.
       </p>
 
-      <div className="mt-10 rounded-[16px] bg-cloud p-6 md:p-10" style={{ boxShadow: "var(--shadow-cloud)" }}>
+      <div data-reveal className="mt-10 rounded-[16px] bg-cloud p-6 md:p-10" style={{ boxShadow: "var(--shadow-cloud)" }}>
         <p className="flex flex-wrap items-baseline gap-x-3 gap-y-4 text-[18px] leading-[44px] text-charcoal">
           <Field label="USDC waiting for payouts" value={amount} onChange={setAmount} suffix="USDC waits" width="160px" max={1_000_000_000} />
           <Field label="Days a month it waits" value={days} onChange={setDays} suffix="days a month, at" width="72px" max={31} />
@@ -80,7 +81,7 @@ export function IdleCash() {
             <>
               <p className="num mb-3 text-[12px] uppercase tracking-[0.24px] text-slate">Illustrative estimate</p>
               <p className="num text-[40px] leading-none tracking-[-1px] text-ink md:text-[56px]">
-                {fmt(lost)} <span className="block pt-2 text-[20px] text-slate sm:inline sm:pt-0 md:text-[24px]">USDC a year</span>
+                <CountUp value={lost} format={(n) => fmt(n)} /> <span className="block pt-2 text-[20px] text-slate sm:inline sm:pt-0 md:text-[24px]">USDC a year</span>
               </p>
               <p className="mt-3 text-[16px] text-charcoal">is what that cash isn&apos;t earning.</p>
               <p className="num mt-6 text-[13px] text-slate">

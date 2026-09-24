@@ -25,7 +25,7 @@ function Row({ v }: { v: VaultInfo }) {
 
 function Panel({ children, note }: { children: React.ReactNode; note: string }) {
   return (
-    <div className="mt-10 overflow-hidden rounded-[16px] bg-cloud" style={{ boxShadow: "var(--shadow-cloud)" }}>
+    <div data-reveal className="mt-10 overflow-hidden rounded-[16px] bg-cloud" style={{ boxShadow: "var(--shadow-cloud)" }}>
       {children}
       <p className="border-t border-steel px-6 py-4 text-[13px] text-slate">{note}</p>
     </div>
@@ -76,7 +76,7 @@ export function Vaults() {
     <section id="vaults" className="scroll-mt-8 border-t border-steel" aria-labelledby="vaults-heading">
       <div className="container-page py-20 md:py-28">
         <p className="label">Where the money goes</p>
-        <h2 id="vaults-heading" className="display-section mt-5 max-w-[980px] text-ink">
+        <h2 id="vaults-heading" data-reveal className="display-section mt-5 max-w-[980px] text-ink">
           RWA vaults from IXS.
         </h2>
         <p className="mt-5 max-w-[600px] text-[18px] leading-[27px] text-slate">

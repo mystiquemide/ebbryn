@@ -27,17 +27,17 @@ export function BuiltOn() {
     <section className="border-t border-steel" aria-labelledby="built-heading">
       <div className="container-page py-16 md:py-24">
         <p className="label">Built on</p>
-        <h2 id="built-heading" className="display-section mt-5 max-w-[980px] text-ink">
+        <h2 id="built-heading" data-reveal className="display-section mt-5 max-w-[980px] text-ink">
           Two layers doing real work.
         </h2>
         <ul className="mt-10 grid gap-4 md:grid-cols-2">
-          {SPONSORS.map((s) => (
-            <li key={s.name}>
+          {SPONSORS.map((s, i) => (
+            <li key={s.name} data-reveal style={{ "--d": `${i * 140}ms` } as React.CSSProperties}>
               <a
                 href={s.href}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex h-full flex-col gap-6 rounded-[16px] bg-cloud p-6 transition-colors hover:bg-[#e9e9ec] md:p-8"
+                className="lift group flex h-full flex-col gap-6 rounded-[16px] bg-cloud p-6 hover:bg-[#e9e9ec] md:p-8"
                 style={{ boxShadow: "var(--shadow-cloud)" }}
                 aria-label={`${s.name}, opens their site`}
               >

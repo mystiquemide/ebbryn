@@ -7,7 +7,7 @@ import { Arrow } from "../SiteNav";
 export function FinalCta() {
   return (
     <section className="container-page pb-20 md:pb-28" aria-labelledby="cta-heading">
-      <div className="relative isolate overflow-hidden rounded-[16px] bg-graphite" style={{ boxShadow: "var(--shadow-graphite)" }}>
+      <div data-reveal className="relative isolate overflow-hidden rounded-[16px] bg-graphite" style={{ boxShadow: "var(--shadow-graphite)" }}>
         <img
           src="/photos/tide-2000.webp"
           srcSet="/photos/tide-1000.webp 1000w, /photos/tide-2000.webp 2000w"
@@ -16,7 +16,7 @@ export function FinalCta() {
           width={2000}
           height={1125}
           loading="lazy"
-          className="absolute inset-0 -z-10 h-full w-full object-cover"
+          className="push-in absolute inset-0 -z-10 h-full w-full object-cover"
         />
         <div className="absolute inset-0 -z-10" style={{ background: "rgba(24,24,27,0.62)" }} aria-hidden="true" />
         <div className="flex flex-col gap-8 px-6 py-16 md:px-14 md:py-24">
