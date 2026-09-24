@@ -6,6 +6,7 @@ import { CaughtMistake } from "@/components/landing/CaughtMistake";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { WhoItsFor } from "@/components/landing/WhoItsFor";
 import { Vaults } from "@/components/landing/Vaults";
+import { FinalCta } from "@/components/landing/FinalCta";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,7 @@ export default function Home() {
         <HowItWorks />
         <WhoItsFor />
         <Vaults />
+        <FinalCta />
       </main>
       <SiteFooter />
     </>
