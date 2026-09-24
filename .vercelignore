@@ -1,0 +1,8 @@
+docs
+memory.md
+.env*
+!.env.example
+AGENTS.md
+CLAUDE.md
+.next
+node_modules
