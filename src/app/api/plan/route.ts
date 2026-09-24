@@ -78,6 +78,9 @@ export async function POST(req: Request) {
     if (e instanceof IxsError) {
       return Response.json({ error: "IXS didn't answer in time, so Ebbryn couldn't check the vaults. Nothing was changed. Try again in a minute." }, { status: 502 });
     }
+    if (e instanceof ServError && /credit/.test(e.message)) {
+      return Response.json({ error: "Planning is paused while Ebbryn's SERV credits are topped up. Nothing was changed. Try again later." }, { status: 503 });
+    }
     if (e instanceof ServError) {
       return Response.json({ error: "SERV couldn't finish this plan. Nothing was changed. Try again in a minute." }, { status: 502 });
     }

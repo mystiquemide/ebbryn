@@ -116,7 +116,7 @@ export async function requestPlan(req: PlanRequest, failures?: CheckFailure[]): 
     .create({
       model: SERV_MODEL,
       reasoning_effort: "low",
-      max_completion_tokens: 6000,
+      max_completion_tokens: 4500,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userMessage(req, failures) },
@@ -145,6 +145,7 @@ export async function requestPlan(req: PlanRequest, failures?: CheckFailure[]): 
     ({ data, response } = await call);
   } catch (e) {
     if (e instanceof OpenAI.APIConnectionTimeoutError) throw new ServError("SERV took too long to plan. Try again.");
+    if (e instanceof OpenAI.APIError && e.status === 402) throw new ServError("SERV credit balance too low");
     if (e instanceof OpenAI.APIError) throw new ServError(`SERV returned HTTP ${e.status}`);
     throw e;
   } finally {
