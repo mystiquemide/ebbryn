@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { InputError, parsePlanInputs } from "./input";
-import { cacheGet, cacheSet, resetLimits, takePlanSlot } from "./ratelimit";
+import { cacheGet, cacheSet, resetLimits, takePlanSlot, takeSharedPlanSlot } from "./ratelimit";
 import { canonical, signPayload, verifyPayload } from "./sign";
 
 process.env.PLAN_SIGNING_SECRET = "x".repeat(64);
@@ -58,5 +58,15 @@ describe("parsePlanInputs", () => {
     expect(() => parsePlanInputs({ ...good, limits: { maxParkedPct: 150, minLiquidDays: 3 } }, "2026-09-25")).toThrow(InputError);
     expect(() => parsePlanInputs({ ...good, payouts: [] }, "2026-09-25")).toThrow(InputError);
     expect(() => parsePlanInputs({ ...good, payouts: [{ ...good.payouts[0], repeat: "weekly" }] }, "2026-09-25")).toThrow(InputError);
+  });
+});
+
+describe("shared rate limit", () => {
+  beforeEach(() => resetLimits());
+
+  it("falls back to in-memory limits when Redis isn't configured", async () => {
+    const t = Date.parse("2026-09-24T12:00:00Z");
+    for (let i = 0; i < 5; i++) expect((await takeSharedPlanSlot("9.9.9.9", t + i)).ok).toBe(true);
+    expect((await takeSharedPlanSlot("9.9.9.9", t + 10)).ok).toBe(false);
   });
 });

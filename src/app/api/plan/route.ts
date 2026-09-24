@@ -2,7 +2,7 @@ import { checkPlan } from "@/lib/check";
 import { InputError, parsePlanInputs, WINDOW_DAYS, type PlanInputs } from "@/lib/input";
 import { IxsError, listVaults } from "@/lib/ixs";
 import type { CheckResult, Plan, VaultInfo } from "@/lib/plan";
-import { cacheGet, cacheSet, takePlanSlot } from "@/lib/ratelimit";
+import { cacheGet, cacheSet, takeSharedPlanSlot } from "@/lib/ratelimit";
 import { expandSchedule } from "@/lib/schedule";
 import { requestPlan, ServError, type ServMeta } from "@/lib/serv";
 import { canonical, signPayload } from "@/lib/sign";
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
   const cached = cacheGet<PlanResponse>(cacheKey);
   if (cached) return Response.json({ ...cached, cached: true });
 
-  const slot = takePlanSlot(clientIp(req));
+  const slot = await takeSharedPlanSlot(clientIp(req));
   if (!slot.ok) {
     return Response.json(
       { error: "Planning is paused for a few minutes to protect shared credits.", reason: slot.reason, retryAfterSec: slot.retryAfterSec },
