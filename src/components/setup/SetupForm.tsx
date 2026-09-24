@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useState } from "react";
 import { InputError, parsePlanInputs, WINDOW_DAYS } from "@/lib/input";
@@ -180,6 +181,12 @@ export function SetupForm() {
     <div className="container-page grid gap-10 py-12 md:py-16 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
       <div className="flex flex-col gap-10">
         <header className="flex flex-col gap-5">
+          <Link href="/" className="btn btn-soft self-start">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M13 8H4M7.5 4.5 4 8l3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Back to home
+          </Link>
           <p className="label">Step 1 of 3</p>
           <h1 className="display-section text-ink">Tell Ebbryn what&apos;s coming up.</h1>
           <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Start from">
@@ -382,7 +389,7 @@ export function SetupForm() {
             </div>
             <div className="flex flex-col gap-1 border-t border-white/10 pt-3">
               <div className="flex justify-between">
-                <dt className="text-white/70">Most you allow parked</dt>
+                <dt className="text-white/70">Maximum parking allowed</dt>
                 <dd className="num">{summary.maxPark !== null ? formatUsdc(summary.maxPark) : "Not set"}</dd>
               </div>
               {summary.pct !== null && <p className="text-[12px] text-white/50">Capped by your {summary.pct}% hard limit.</p>}
@@ -394,13 +401,7 @@ export function SetupForm() {
             </p>
           )}
           {cta("mt-6")}
-          <p className="mt-3 text-[13px] text-white/55">
-            {leaving
-              ? "SERV is evaluating your payouts and rules. Usually 40 to 70 seconds."
-              : canPlan
-                ? "SERV plans usually take 40 to 70 seconds."
-                : "Add a balance and at least one payout to plan."}
-          </p>
+          {!canPlan && <p className="mt-3 text-[13px] text-white/55">Add a balance and at least one payout to plan.</p>}
           {error && <p className="mt-3 rounded-[12px] p-3 text-[13px] text-paper" style={{ background: "rgba(179,38,30,0.35)" }}>{error}</p>}
         </div>
       </aside>
