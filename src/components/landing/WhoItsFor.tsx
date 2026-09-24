@@ -1,51 +1,26 @@
-/* eslint-disable @next/next/no-img-element -- Unsplash asks for hotlinked images from its own CDN, so no next/image proxy. */
+/* eslint-disable @next/next/no-img-element -- plain img with a hand-written srcSet for two static photos. */
 
-type Photo = { src: string; alt: string; author: string; authorUrl: string; photoUrl: string };
+// Photos from Unsplash (Unsplash License), downloaded into public/photos:
+// payroll: https://unsplash.com/photos/man-operating-laptop-on-top-of-table-C3V88BOoRoM by Bench Accounting
+// agents:  https://unsplash.com/photos/a-group-of-people-working-on-computers-in-a-room-3yb7ZsaY0LY by Anastassia Anufrieva
+type Photo = { name: string; alt: string };
 
-const UTM = "utm_source=ebbryn&utm_medium=referral";
-
-const PAYROLL: Photo = {
-  src: "https://images.unsplash.com/photo-1448932223592-d1fc686e76ea",
-  alt: "A man working on a laptop at a wooden table by a window",
-  author: "Bench Accounting",
-  authorUrl: "https://unsplash.com/@benchaccounting",
-  photoUrl: "https://unsplash.com/photos/man-operating-laptop-on-top-of-table-C3V88BOoRoM",
-};
-
-const AGENTS: Photo = {
-  src: "https://images.unsplash.com/photo-1723987251277-18fc0a1effd0",
-  alt: "A small team working at computer monitors in an office",
-  author: "Anastassia Anufrieva",
-  authorUrl: "https://unsplash.com/@antoie",
-  photoUrl: "https://unsplash.com/photos/a-group-of-people-working-on-computers-in-a-room-3yb7ZsaY0LY",
-};
+const PAYROLL: Photo = { name: "payroll", alt: "A man working on a laptop at a wooden table by a window" };
+const AGENTS: Photo = { name: "agents", alt: "A small team working at computer monitors in an office" };
 
 function PhotoFigure({ p }: { p: Photo }) {
-  const base = `${p.src}?fit=crop&crop=entropy&q=80&fm=webp`;
   return (
-    <figure>
-      <img
-        src={`${base}&w=1200&h=900`}
-        srcSet={`${base}&w=600&h=450 600w, ${base}&w=900&h=675 900w, ${base}&w=1200&h=900 1200w`}
-        sizes="(min-width: 1024px) 560px, 100vw"
-        alt={p.alt}
-        width={1200}
-        height={900}
-        loading="lazy"
-        className="aspect-[4/3] w-full rounded-[16px] bg-cloud object-cover"
-        style={{ boxShadow: "var(--shadow-cloud)" }}
-      />
-      <figcaption className="mt-3 text-[12px] text-slate">
-        Photo by{" "}
-        <a href={`${p.authorUrl}?${UTM}`} target="_blank" rel="noreferrer" className="underline-offset-2 hover:text-ink hover:underline">
-          {p.author}
-        </a>{" "}
-        on{" "}
-        <a href={`https://unsplash.com/?${UTM}`} target="_blank" rel="noreferrer" className="underline-offset-2 hover:text-ink hover:underline">
-          Unsplash
-        </a>
-      </figcaption>
-    </figure>
+    <img
+      src={`/photos/${p.name}-1200.webp`}
+      srcSet={`/photos/${p.name}-600.webp 600w, /photos/${p.name}-1200.webp 1200w`}
+      sizes="(min-width: 1024px) 560px, 100vw"
+      alt={p.alt}
+      width={1200}
+      height={900}
+      loading="lazy"
+      className="aspect-[4/3] w-full rounded-[16px] bg-cloud object-cover"
+      style={{ boxShadow: "var(--shadow-cloud)" }}
+    />
   );
 }
 
