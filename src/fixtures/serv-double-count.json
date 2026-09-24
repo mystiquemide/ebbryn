@@ -1,0 +1,56 @@
+{
+  "label": "Recorded SERV output, Sep 24",
+  "recordedAt": "2026-09-24",
+  "model": "gpt-6-luna-serv-kronos-multipath",
+  "features": ["strict json_schema", "serv_shadow_agent", "reasoning_effort low"],
+  "note": "rawOutput is the exact response content. plan maps it to Ebbryn's plan shape using the model's own reasons: liquid covers the Oct 1 payroll and 3 days of agent spend, and a redemption also covers the Oct 1 payroll.",
+  "inputs": {
+    "today": "2026-09-24",
+    "windowDays": 8,
+    "balance": 20000,
+    "payouts": [
+      { "id": "payroll", "label": "Payroll", "amount": 8000, "date": "2026-10-01", "repeat": "none" },
+      { "id": "agents", "label": "Agent top-up", "amount": 150, "date": "2026-09-24", "repeat": "daily" }
+    ],
+    "rules": "Keep 3 days of agent spend liquid on top of anything due within 3 days; park at most 60% of balance; request redemption early enough to land 1 day before a payout.",
+    "limits": { "maxParkedPct": 60, "minLiquidDays": 3 },
+    "vaults": [
+      {
+        "id": "recorded-async",
+        "name": "Async vault in the recorded prompt",
+        "network": "prompt",
+        "chainId": 0,
+        "address": "0x0000000000000000000000000000000000000000",
+        "asset": "0x0000000000000000000000000000000000000000",
+        "decimals": 6,
+        "settlement": "async-erc7540",
+        "lagDays": 2,
+        "acceptsDeposits": true,
+        "explorerUrl": ""
+      }
+    ]
+  },
+  "rawOutput": {
+    "liquid": 8450,
+    "parked": 11550,
+    "redeem_request_date": "Sep 28",
+    "reasons": [
+      "Keep $450 liquid for three days of agent spend at $150 per day, plus $8,000 for the Oct 1 payroll, so payroll is covered without relying on the vault claim arriving.",
+      "Park $11,550, which is below the 60% maximum of $12,000.",
+      "Request redemption of $8,000 on Sep 28 so it can land Sep 30, one day before payroll."
+    ]
+  },
+  "plan": {
+    "liquid": 8450,
+    "liquidFunds": ["payroll@2026-10-01", "agents@2026-09-24", "agents@2026-09-25", "agents@2026-09-26"],
+    "parked": [{ "vaultId": "recorded-async", "amount": 11550 }],
+    "redemptions": [
+      { "vaultId": "recorded-async", "amount": 8000, "requestDate": "2026-09-28", "funds": ["payroll@2026-10-01"] }
+    ],
+    "reasons": [
+      { "text": "Keep $450 liquid for three days of agent spend at $150 per day, plus $8,000 for the Oct 1 payroll.", "rule": "Keep 3 days of agent spend liquid on top of anything due within 3 days" },
+      { "text": "Park $11,550, which is below the 60% maximum of $12,000.", "rule": "Park at most 60% of balance" },
+      { "text": "Request redemption of $8,000 on Sep 28 so it can land Sep 30, one day before payroll.", "rule": "Request redemption early enough to land 1 day before a payout" }
+    ]
+  }
+}
