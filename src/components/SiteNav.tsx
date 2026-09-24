@@ -55,7 +55,7 @@ export function SiteNav({ step }: { step?: 1 | 2 | 3 }) {
   return (
     <header className="border-b border-steel bg-paper">
       <nav className="container-page flex h-[72px] items-center justify-between gap-6" aria-label="Main">
-        <Link href="/" aria-label="Ebbryn home" className="shrink-0">
+        <Link href="/" aria-label="Ebbryn home" className="flex min-h-[44px] shrink-0 items-center">
           <Wordmark />
         </Link>
 

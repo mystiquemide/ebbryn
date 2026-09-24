@@ -12,19 +12,19 @@ export function SiteFooter() {
         </div>
         <div className="flex flex-col gap-1 md:gap-3">
           <p className="label">Product</p>
-          <Link href="/#how" className="inline-block py-2 text-charcoal hover:text-ink md:py-0">How it works</Link>
-          <Link href="/#vaults" className="inline-block py-2 text-charcoal hover:text-ink md:py-0">Vaults</Link>
+          <Link href="/#how" className="inline-flex min-h-[44px] items-center text-charcoal hover:text-ink md:min-h-0">How it works</Link>
+          <Link href="/#vaults" className="inline-flex min-h-[44px] items-center text-charcoal hover:text-ink md:min-h-0">Vaults</Link>
         </div>
         <div className="flex flex-col gap-1 md:gap-3">
           <p className="label label-dev">Built on</p>
-          <a href="https://www.openserv.ai" target="_blank" rel="noreferrer" className="inline-block py-2 text-charcoal hover:text-ink md:py-0">
+          <a href="https://www.openserv.ai" target="_blank" rel="noreferrer" className="inline-flex min-h-[44px] items-center text-charcoal hover:text-ink md:min-h-0">
             SERV Reasoning by OpenServ
           </a>
-          <a href="https://www.ixs.finance/vaults" target="_blank" rel="noreferrer" className="inline-block py-2 text-charcoal hover:text-ink md:py-0">
+          <a href="https://www.ixs.finance/vaults" target="_blank" rel="noreferrer" className="inline-flex min-h-[44px] items-center text-charcoal hover:text-ink md:min-h-0">
             IXS vaults
           </a>
           {REPO_URL && (
-            <a href={REPO_URL} target="_blank" rel="noreferrer" className="inline-block py-2 text-charcoal hover:text-ink md:py-0">
+            <a href={REPO_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-[44px] items-center text-charcoal hover:text-ink md:min-h-0">
               GitHub
             </a>
           )}
