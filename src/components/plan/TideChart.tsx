@@ -68,7 +68,8 @@ export function TideChart({ days, balance, start }: { days: Day[]; balance: numb
         <span>{dayLabel(days[n - 1].date)}</span>
       </div>
 
-      <table className="sr-only">
+      <div className="sr-only">
+      <table>
         <caption>Ready and parked cash on days when money moves</caption>
         <thead>
           <tr>
@@ -98,6 +99,7 @@ export function TideChart({ days, balance, start }: { days: Day[]; balance: numb
             ))}
         </tbody>
       </table>
+      </div>
 
       {marks.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2 border-t border-steel pt-4">
