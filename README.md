@@ -8,7 +8,7 @@
 
 Built for the OpenServ SERV Hackathon, Edition 01, RWA Vaults track (partner: IXS Finance).
 
-**Live:** https://ebbryn.vercel.app (BSC testnet)
+**Live:** https://ebbryn.vercel.app (BSC testnet) · [Docs](https://ebbryn.vercel.app/docs)
 
 ![Ebbryn landing page](.github/assets/landing.png)
 
