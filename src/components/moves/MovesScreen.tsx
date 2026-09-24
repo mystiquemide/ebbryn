@@ -1,5 +1,6 @@
 "use client";
 
+import { WithdrawalReminder } from "@/components/WithdrawalReminder";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import type { Move } from "@/app/api/moves/route";
@@ -34,8 +35,6 @@ type StepState =
 type Load = { kind: "idle" } | { kind: "loading" } | { kind: "ready"; moves: Move[] } | { kind: "stale"; message: string } | { kind: "error"; message: string };
 
 const short = (a: string) => `${a.slice(0, 6)}...${a.slice(-4)}`;
-const dayLabel = (iso: string) =>
-  new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
 function readPlan(): PlanResult | null {
   try {
@@ -385,6 +384,8 @@ export function MovesScreen() {
         </p>
       )}
 
+      <WithdrawalReminder plan={plan.plan} vaults={plan.vaults} note="Ebbryn re-checked live IXS vault state before building these moves." />
+
       {moves.map((m, mi) => (
         <section key={m.vaultId} className="rounded-[16px] border border-steel bg-paper" aria-label={m.vaultName}>
           <header className="flex flex-wrap items-center justify-between gap-2 border-b border-steel px-5 py-4">
@@ -462,11 +463,6 @@ export function MovesScreen() {
       ))}
 
       <footer className="flex flex-col gap-3 border-t border-steel pt-6 text-[14px] text-charcoal">
-        {plan.plan.redemptions.map((r, k) => (
-          <p key={k}>
-            Next move: on <span className="num text-ink">{dayLabel(r.requestDate)}</span>, come back to sign a <span className="num text-ink">{formatUsdc(r.amount)}</span> USDC withdrawal for the payout it funds. Nothing happens automatically.
-          </p>
-        ))}
         <p className="num text-[12px] text-slate">
           Plan checked {plan.check.passed.length} of 8 · verified by Ebbryn{plan.meta.requestId ? ` · SERV request ${plan.meta.requestId.slice(0, 8)}...` : ""}
         </p>

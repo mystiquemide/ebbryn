@@ -26,10 +26,10 @@ function CardFrame({ title, children, footer }: { title: string; children: React
     <figure className="overflow-hidden rounded-[16px] border border-steel bg-paper" style={{ boxShadow: "var(--shadow-cloud)" }}>
       <figcaption className="flex items-center justify-between border-b border-steel px-5 py-3">
         <span className="num text-[12px] uppercase tracking-[0.24px] text-charcoal">{title}</span>
-        <span className="num text-[11px] text-slate">{real.label}</span>
+        <span className="num text-[12px] text-slate">{real.label}</span>
       </figcaption>
       <div className="p-5">{children}</div>
-      <p className="num border-t border-steel bg-cloud px-5 py-3 text-[11px] text-slate">{footer}</p>
+      <p className="num border-t border-steel bg-cloud px-5 py-3 text-[12px] text-slate">{footer}</p>
     </figure>
   );
 }
@@ -41,7 +41,7 @@ function Pill({ children, tone }: { children: React.ReactNode; tone: "ready" | "
     due: { background: "#27272a", color: "#ffffff" },
   }[tone];
   return (
-    <span className="num inline-flex items-center rounded-[6px] px-2 py-1 text-[11px] leading-none" style={styles}>
+    <span className="num inline-flex items-center rounded-[6px] px-2 py-1 text-[12px] leading-none" style={styles}>
       {children}
     </span>
   );

@@ -78,6 +78,7 @@ export function IdleCash() {
         <div className="mt-8 border-t border-steel pt-8">
           {lost !== null ? (
             <>
+              <p className="num mb-3 text-[12px] uppercase tracking-[0.24px] text-slate">Illustrative estimate</p>
               <p className="num text-[40px] leading-none tracking-[-1px] text-ink md:text-[56px]">
                 {fmt(lost)} <span className="block pt-2 text-[20px] text-slate sm:inline sm:pt-0 md:text-[24px]">USDC a year</span>
               </p>
@@ -93,7 +94,7 @@ export function IdleCash() {
           )}
         </div>
 
-        <p className="mt-6 text-[13px] text-slate">The starting numbers are an example. Change any of them.</p>
+        <p className="mt-6 text-[13px] text-slate">The starting numbers are an example. Change any of them. The rate is your assumption, not a quoted IXS vault return. Fees and withdrawal timing aren&apos;t included.</p>
       </div>
     </section>
   );

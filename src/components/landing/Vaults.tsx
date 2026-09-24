@@ -54,7 +54,7 @@ async function VaultList() {
       )}
       {paused.length > 0 && (
         <details className="group border-t border-steel">
-          <summary className="flex cursor-pointer list-none items-center justify-between px-6 py-4 text-[14px] text-charcoal hover:text-ink">
+          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between px-6 py-4 text-[14px] text-charcoal hover:text-ink">
             <span>Other IXS vaults, paused right now ({paused.length})</span>
             <svg width="16" height="16" viewBox="0 0 16 16" className="transition-transform group-open:rotate-180" aria-hidden="true">
               <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />

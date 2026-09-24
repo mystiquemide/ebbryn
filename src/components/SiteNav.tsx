@@ -33,7 +33,7 @@ function StepRail({ current }: { current: 1 | 2 | 3 }) {
         return (
           <li key={s.n} className="flex items-center gap-2" aria-current={active ? "step" : undefined}>
             <span
-              className="num grid h-5 w-5 place-items-center rounded-[6px] text-[11px]"
+              className="num grid h-5 w-5 place-items-center rounded-[6px] text-[12px]"
               style={{
                 background: active ? "#94faf0" : done ? "#bff660" : "#f4f4f5",
                 color: "#18181b",

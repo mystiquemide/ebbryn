@@ -18,10 +18,10 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <IdleCash />
+        <WhoItsFor />
         <CaughtMistake />
         <HowItWorks />
         <BuiltOn />
-        <WhoItsFor />
         <Vaults />
         <FinalCta />
       </main>

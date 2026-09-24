@@ -17,8 +17,8 @@ export function Hero() {
             on time.
           </h1>
           <p className="max-w-[500px] text-[18px] leading-[27px] text-slate">
-            Keep enough USDC ready for payroll and agent spend. Ebbryn parks the rest in <span className="text-ink">IXS vaults</span>, then brings it
-            back before each payout. <span className="text-ink">You sign every move.</span>
+            Keep enough USDC ready for payroll and agent spend. Ebbryn parks the rest in <span className="text-ink">IXS vaults</span>, then schedules it
+            back before each payout. <span className="text-ink">You sign every move, including the withdrawal.</span>
           </p>
           <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             <Link href="/setup" className="btn btn-primary">
@@ -30,6 +30,7 @@ export function Hero() {
             </Link>
           </div>
           <p className="num text-[12px] uppercase tracking-[0.24px] text-slate">SERV plans. Code checks. IXS builds. You sign.</p>
+          <p className="text-[13px] text-slate">Testnet. IXS vaults need verification on mainnet.</p>
         </div>
 
         <Suspense fallback={<HeroVaultsLoading />}>

@@ -86,7 +86,7 @@ export function CaughtMistake() {
                       <span className="sr-only">Failed: </span>
                       {CHECK_PLAIN[f.code].title}
                     </span>
-                    <span className="num ml-auto text-[11px] text-white/55">{f.code}</span>
+                    <span className="num ml-auto text-[12px] text-white/55">{f.code}</span>
                   </p>
                   <ul className="mt-2 flex flex-col gap-1">
                     {f.details.map((d) => (

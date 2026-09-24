@@ -28,7 +28,7 @@ IXS builds the transactions, and you approve and deposit from your own wallet.
 
 ## Try it in 2 minutes
 
-The hosted app isn't deployed yet. Run it locally (see the last section) with a SERV key, then:
+Live at https://ebbryn.vercel.app (testnet). Planning uses shared SERV credits and is rate limited. Open it, or run it yourself (see the last section), then:
 
 1. Open `/` and scroll to "Why code checks the model". It runs the real checks against a recorded SERV plan that counted payroll twice.
 2. Click **Plan my cash**, keep the Payroll team template, click **Plan my cash** again. A live SERV plan comes back in about 25 to 70 seconds with a tide chart, SERV's reasons and 8 check tiles.

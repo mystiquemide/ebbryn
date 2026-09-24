@@ -1,5 +1,6 @@
 "use client";
 
+import { WithdrawalReminder } from "@/components/WithdrawalReminder";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -229,6 +230,9 @@ export function PlanScreen() {
               </div>
             )}
           </div>
+          {result.check.ok && result.signature && (
+            <WithdrawalReminder plan={result.plan} vaults={result.vaults} note="Moves re-checks live IXS vault state before building anything." />
+          )}
           {state.cached && <p className="text-[12px] text-slate">These inputs match a plan made in the last 10 minutes, so Ebbryn reused that plan instead of asking SERV again.</p>}
         </PlanView>
       );

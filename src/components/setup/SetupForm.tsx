@@ -47,7 +47,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
-const inputCls = "w-full min-w-0 rounded-[12px] border bg-paper px-3 py-2.5 text-[15px] text-ink outline-none focus:border-ink";
+const inputCls = "w-full min-w-0 rounded-[12px] border bg-paper px-3 py-2.5 text-[16px] text-ink outline-none focus:border-ink";
 
 export function SetupForm() {
   const router = useRouter();
@@ -354,7 +354,7 @@ export function SetupForm() {
           </div>
         </section>
 
-        <div className="flex flex-col gap-3 border-t border-steel pt-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="hidden flex-col gap-3 border-t border-steel pt-8 sm:flex-row sm:items-center sm:justify-between lg:flex">
           <p className="text-[14px] text-slate">
             {leaving ? "SERV is evaluating your payouts and rules. Usually 40 to 70 seconds." : canPlan ? "SERV plans usually take 40 to 70 seconds." : "Add a balance and at least one payout to plan."}
           </p>
@@ -402,6 +402,11 @@ export function SetupForm() {
           )}
           {cta("mt-6")}
           {!canPlan && <p className="mt-3 text-[13px] text-white/55">Add a balance and at least one payout to plan.</p>}
+          {canPlan && (
+            <p className="mt-3 text-[13px] text-white/55 lg:hidden">
+              {leaving ? "SERV is evaluating your payouts and rules. Usually 40 to 70 seconds." : "SERV plans usually take 40 to 70 seconds."}
+            </p>
+          )}
           {error && <p className="mt-3 rounded-[12px] p-3 text-[13px] text-paper" style={{ background: "rgba(179,38,30,0.35)" }}>{error}</p>}
         </div>
       </aside>

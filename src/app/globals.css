@@ -90,7 +90,7 @@ body {
     font-family: var(--font-display);
     font-weight: 500;
     font-size: 48px;
-    line-height: 40px;
+    line-height: 45px;
     letter-spacing: -1.9px;
   }
   .display-section {
@@ -223,5 +223,12 @@ body {
   .tide-draw {
     animation: none;
     stroke-dasharray: none;
+  }
+}
+
+/* Phones: comfortable tap targets. */
+@media (max-width: 767px) {
+  .btn {
+    min-height: 44px;
   }
 }
