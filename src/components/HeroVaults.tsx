@@ -40,7 +40,7 @@ function Stack({ sheets, status }: { sheets: Sheet[]; status: string }) {
   return (
     <figure className="relative w-full">
       <div
-        className="relative mx-auto flex w-full max-w-[560px] flex-col gap-4 overflow-hidden rounded-[16px] bg-cloud p-4 lg:block lg:aspect-[1/0.92] lg:p-0"
+        className="tilt-loop relative mx-auto flex w-full max-w-[560px] flex-col gap-4 overflow-hidden rounded-[16px] bg-cloud p-4 lg:block lg:aspect-[1/0.92] lg:p-0"
         style={{
           boxShadow: "var(--shadow-cloud)",
           backgroundImage: "radial-gradient(#d4d4d8 1px, transparent 1px)",

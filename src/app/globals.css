@@ -185,3 +185,24 @@ body {
     background: #b2ec4c;
   }
 }
+
+/* Slow looping tilt for the hero diagram. Small angles so the vault text stays readable. */
+@keyframes tide-tilt {
+  0%,
+  100% {
+    transform: perspective(1400px) rotateX(4deg) rotateY(-7deg) rotateZ(-0.6deg);
+  }
+  50% {
+    transform: perspective(1400px) rotateX(-2deg) rotateY(7deg) rotateZ(0.6deg);
+  }
+}
+.tilt-loop {
+  animation: tide-tilt 14s ease-in-out infinite;
+  transform-origin: 50% 55%;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tilt-loop {
+    animation: none;
+  }
+}
