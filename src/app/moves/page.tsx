@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/og";
 import Link from "next/link";
 import { MovesScreen } from "@/components/moves/MovesScreen";
 import { SiteNav } from "@/components/SiteNav";
 
-export const metadata: Metadata = { title: "Moves · Ebbryn" };
+export const metadata: Metadata = pageMeta({ title: "Moves", description: "IXS builds the exact approve and deposit transactions. You review and sign every move in your own wallet.", path: "/moves" });
 
 export default function MovesPage() {
   return (

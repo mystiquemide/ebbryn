@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/og";
 import Link from "next/link";
 import { DocPage } from "@/components/DocPage";
 import { REPO_URL } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Privacy · Ebbryn",
+export const metadata: Metadata = pageMeta({
+  title: "Privacy",
   description: "What Ebbryn collects, where it goes, how long it's kept and your choices.",
-};
+  path: "/privacy",
+});
 
 const TOC = [
   { id: "summary", label: "Summary" },

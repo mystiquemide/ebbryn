@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/og";
 import Link from "next/link";
 import { DocPage } from "@/components/DocPage";
 import { CHECK_PLAIN } from "@/lib/checkCopy";
 import type { CheckCode } from "@/lib/plan";
 import { REPO_URL } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Docs · Ebbryn",
+export const metadata: Metadata = pageMeta({
+  title: "Docs",
   description: "How to plan USDC payouts with Ebbryn: quickstart, how the plan and checks work, wallet setup, API reference and troubleshooting.",
-};
+  path: "/docs",
+});
 
 const TOC = [
   { id: "quickstart", label: "Quickstart" },

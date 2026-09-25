@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/og";
 import Link from "next/link";
 import { Suspense } from "react";
 import { PlanScreen } from "@/components/plan/PlanScreen";
 import { SiteNav } from "@/components/SiteNav";
 
-export const metadata: Metadata = { title: "Plan · Ebbryn" };
+export const metadata: Metadata = pageMeta({ title: "Plan", description: "SERV Reasoning proposes what stays ready and what is parked, with withdrawal dates. Eight code checks gate every plan.", path: "/plan" });
 
 export default function PlanPage() {
   return (

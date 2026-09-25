@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/og";
 import Link from "next/link";
 import { DocPage } from "@/components/DocPage";
 import { REPO_URL } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Terms · Ebbryn",
+export const metadata: Metadata = pageMeta({
+  title: "Terms",
   description: "The terms for using Ebbryn, a non-custodial testnet planner for USDC payouts.",
-};
+  path: "/terms",
+});
 
 const TOC = [
   { id: "agreement", label: "Agreement" },
