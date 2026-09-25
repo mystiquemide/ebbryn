@@ -3,12 +3,14 @@
 [![CI](https://github.com/mystiquemide/ebbryn/actions/workflows/ci.yml/badge.svg)](https://github.com/mystiquemide/ebbryn/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 [![Live demo](https://img.shields.io/badge/demo-ebbryn.vercel.app-94faf0.svg)](https://ebbryn.vercel.app)
+[![IXS vault on BSC testnet](https://img.shields.io/badge/BSC%20testnet-IXS%20vault-F0B90B)](https://testnet.bscscan.com/address/0xCb09a5326AEFD705d14FF4C5ca2beD7086ba0Dcc)
+[![SERV Hackathon](https://img.shields.io/badge/built%20for-SERV%20Hackathon%20Ed.01-18181b)](https://www.openserv.ai/hackathon)
 
 **Cash that comes back on time.** Ebbryn parks the USDC a business holds for payroll in IXS RWA vaults and brings it back before each payout. SERV plans it, code checks it, and you sign every move.
 
 Built for the OpenServ SERV Hackathon, Edition 01, RWA Vaults track (partner: IXS Finance).
 
-**Live:** https://ebbryn.vercel.app (BSC testnet) · [Docs](https://ebbryn.vercel.app/docs)
+[Live app](https://ebbryn.vercel.app) · [Plan my cash](https://ebbryn.vercel.app/setup) · [Rejected plan](https://ebbryn.vercel.app/plan?case=recorded) · [Docs](https://ebbryn.vercel.app/docs) · [Live vaults API](https://ebbryn.vercel.app/api/vaults) · [IXS issue #5](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5)
 
 ![Ebbryn landing page](.github/assets/landing.png)
 
