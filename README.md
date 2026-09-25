@@ -10,7 +10,7 @@
 
 Built for the OpenServ SERV Hackathon, Edition 01, Open Track.
 
-[Live app](https://ebbryn.midelabs.xyz/?via=gh) · [Plan my cash](https://ebbryn.midelabs.xyz/setup?via=gh) · [Rejected plan](https://ebbryn.midelabs.xyz/plan?case=recorded&via=gh) · [Docs](https://ebbryn.midelabs.xyz/docs?via=gh) · [Live vaults API](https://ebbryn.midelabs.xyz/api/vaults) · [IXS issue #5](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5)
+[Live app](https://ebbryn.midelabs.xyz/?via=gh) · [Plan my cash](https://ebbryn.midelabs.xyz/setup?via=gh) · [Rejected plan](https://ebbryn.midelabs.xyz/plan?case=recorded&via=gh) · [Docs](https://ebbryn.midelabs.xyz/docs?via=gh) · [Live vaults API](https://ebbryn.midelabs.xyz/api/vaults) · [IXS integration notes](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5)
 
 ![Ebbryn landing page](.github/assets/landing.png)
 
@@ -80,7 +80,7 @@ sequenceDiagram
 
 The rule of the design: judgment goes to the model, arithmetic goes to code. SERV weighs competing goals like your buffer rules, payout dates and withdrawal lag. Code owns every sum, date and limit.
 
-## Sponsor integrations
+## Integrations
 
 ### SERV Reasoning (OpenServ)
 
@@ -107,6 +107,8 @@ API notes from building: a system message is required, `temperature` isn't suppo
 | Target vault | IXHYB - BSC `0xCb09a5326AEFD705d14FF4C5ca2beD7086ba0Dcc`, BSC testnet (chain 97), withdraw anytime |
 
 Found while building and reported in [IXS-Finance/ixs-rwa-agent-skills#5](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5): the Avalanche and Arc vaults accept no deposits, `vault_request_status` errors, parallel MCP calls hang, and `vaults_list` returns a subset. Ebbryn queues MCP calls one at a time, retries once on timeout, and reads discovery from REST.
+
+**What works and what's next.** Ebbryn reads IXS's vault API and uses IXS MCP to build the exact approve and deposit, verified before you sign. IXS's testnet is internal with no public test USDC, so testnet deposits can't be funded. IXS mainnet vaults (BSC `0xc975a3EeF2e49F8eDdEf585340C43f15300fCB82`, Avalanche `0xaD01573b459805E3954398796203d830B57A8bD9`) accept real deposits from $100. Pointing Ebbryn at them is a network and API switch, not a redesign.
 
 ## The eight checks
 
