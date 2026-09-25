@@ -221,7 +221,7 @@ export default function DocsPage() {
       </h3>
       <p>Returns a plan, SERV’s reasons, the result of every check and, if all pass, a signature. Counts toward the planning limit.</p>
       <pre>
-        <code>{`curl -X POST https://ebbryn.vercel.app/api/plan \\
+        <code>{`curl -X POST https://ebbryn.midelabs.xyz/api/plan \\
   -H 'content-type: application/json' \\
   -d '{
     "balance": 128400,

@@ -10,7 +10,7 @@ const DESCRIPTION =
   "Ebbryn parks the USDC you hold for payroll in IXS vaults and brings it back before payday. SERV plans it, code checks it, and you sign it.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ebbryn.vercel.app"),
+  metadataBase: new URL("https://ebbryn.midelabs.xyz"),
   title: "Ebbryn: cash that comes back on time",
   description: DESCRIPTION,
   openGraph: {
