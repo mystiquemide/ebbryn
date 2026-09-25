@@ -6,10 +6,25 @@ const inter = Inter({ variable: "--font-inter", subsets: ["latin"], weight: ["50
 const interTight = Inter_Tight({ variable: "--font-inter-tight", subsets: ["latin"], weight: ["500"] });
 const chivoMono = Chivo_Mono({ variable: "--font-chivo-mono", subsets: ["latin"], weight: ["400"] });
 
+const DESCRIPTION =
+  "Ebbryn parks the USDC you hold for payroll in IXS vaults and brings it back before payday. SERV plans it, code checks it, and you sign it.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ebbryn.vercel.app"),
   title: "Ebbryn: cash that comes back on time",
-  description:
-    "Ebbryn parks the USDC you hold for payroll in IXS vaults and brings it back before payday. SERV plans it, code checks it, and you sign it.",
+  description: DESCRIPTION,
+  openGraph: {
+    type: "website",
+    siteName: "Ebbryn",
+    title: "Ebbryn: cash that comes back on time",
+    description: DESCRIPTION,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ebbryn: cash that comes back on time",
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
