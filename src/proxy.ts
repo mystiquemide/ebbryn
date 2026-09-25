@@ -2,8 +2,8 @@ import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server
 import { REVIEW_COOKIE, beacon, device, reviewId } from "@/server/beacon";
 
 const TAG = "via";
-// One tag per place the link is shared. sv = the SERV Hackathon submission.
-const REVIEW_VALUE = "sv";
+// One tag per place the link is shared, so each alert says where the visitor came from.
+const SOURCES: Record<string, string> = { sv: "submission", gh: "GitHub README" };
 
 export function proxy(request: NextRequest, event: NextFetchEvent) {
   const url = request.nextUrl;
@@ -11,13 +11,14 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   const who = `${device(request.headers.get("user-agent"))}, ${country}`;
 
   // Arrival through the review link: mark the session, then continue on the clean URL.
-  if (url.searchParams.get(TAG) === REVIEW_VALUE) {
+  const source = SOURCES[url.searchParams.get(TAG) ?? ""];
+  if (source) {
     const id = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
     const clean = url.clone();
     clean.searchParams.delete(TAG);
     const res = NextResponse.redirect(clean);
     res.cookies.set(REVIEW_COOKIE, id, { httpOnly: true, sameSite: "lax", secure: true, path: "/", maxAge: 60 * 60 * 24 * 30 });
-    event.waitUntil(beacon(`Ebbryn review visit ${id}: opened ${clean.pathname}${clean.search} (${who})`));
+    event.waitUntil(beacon(`Ebbryn review visit ${id} from ${source}: opened ${clean.pathname}${clean.search} (${who})`));
     return res;
   }
 

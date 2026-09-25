@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/mystiquemide/ebbryn/actions/workflows/ci.yml/badge.svg)](https://github.com/mystiquemide/ebbryn/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
-[![Live demo](https://img.shields.io/badge/demo-ebbryn.vercel.app-94faf0.svg)](https://ebbryn.vercel.app)
+[![Live demo](https://img.shields.io/badge/demo-ebbryn.vercel.app-94faf0.svg)](https://ebbryn.vercel.app/?via=gh)
 [![IXS vault on BSC testnet](https://img.shields.io/badge/BSC%20testnet-IXS%20vault-F0B90B)](https://testnet.bscscan.com/address/0xCb09a5326AEFD705d14FF4C5ca2beD7086ba0Dcc)
 [![SERV Hackathon](https://img.shields.io/badge/built%20for-SERV%20Hackathon%20Ed.01-18181b)](https://www.openserv.ai/hackathon)
 
@@ -10,7 +10,7 @@
 
 Built for the OpenServ SERV Hackathon, Edition 01, RWA Vaults track (partner: IXS Finance).
 
-[Live app](https://ebbryn.vercel.app) · [Plan my cash](https://ebbryn.vercel.app/setup) · [Rejected plan](https://ebbryn.vercel.app/plan?case=recorded) · [Docs](https://ebbryn.vercel.app/docs) · [Live vaults API](https://ebbryn.vercel.app/api/vaults) · [IXS issue #5](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5)
+[Live app](https://ebbryn.vercel.app/?via=gh) · [Plan my cash](https://ebbryn.vercel.app/setup?via=gh) · [Rejected plan](https://ebbryn.vercel.app/plan?case=recorded&via=gh) · [Docs](https://ebbryn.vercel.app/docs?via=gh) · [Live vaults API](https://ebbryn.vercel.app/api/vaults) · [IXS issue #5](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5)
 
 ![Ebbryn landing page](.github/assets/landing.png)
 
@@ -34,7 +34,7 @@ A plan that passes all eight checks is signed by the server, IXS builds the unsi
 
 ## Try it
 
-No install needed. Open https://ebbryn.vercel.app and:
+No install needed. Open [ebbryn.vercel.app](https://ebbryn.vercel.app/?via=gh) and:
 
 1. Click **See a real plan** to watch the eight checks reject the recorded SERV plan that counted payroll twice.
 2. Click **Plan my cash**, keep the Payroll team template, and click **Plan my cash** again. A live SERV plan comes back in about 40 seconds to 2 minutes, with a 30-day chart, SERV's reasons and the check results.
