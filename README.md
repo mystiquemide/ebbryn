@@ -8,7 +8,7 @@
 
 **Cash that comes back on time.** Ebbryn parks the USDC a business holds for payroll in IXS RWA vaults and brings it back before each payout. SERV plans it, code checks it, and you sign every move.
 
-Built for the OpenServ SERV Hackathon, Edition 01, RWA Vaults track (partner: IXS Finance).
+Built for the OpenServ SERV Hackathon, Edition 01, Open Track.
 
 [Live app](https://ebbryn.midelabs.xyz/?via=gh) · [Plan my cash](https://ebbryn.midelabs.xyz/setup?via=gh) · [Rejected plan](https://ebbryn.midelabs.xyz/plan?case=recorded&via=gh) · [Docs](https://ebbryn.midelabs.xyz/docs?via=gh) · [Live vaults API](https://ebbryn.midelabs.xyz/api/vaults) · [IXS issue #5](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5)
 
@@ -148,7 +148,7 @@ First customers: non-US companies paying 10 to 50 contractors in USDC, and opera
 ## Limitations
 
 - Hackathon code, unaudited, testnet only. Don't use it with real funds.
-- Awaiting sponsor test funds. IXS test USDC can only be minted by IXS, and the request is open in issue #5. The approve and deposit are built by IXS and checked, but not broadcast yet.
+- No deposit is broadcast. IXS confirmed its testnet is internal and has no public test USDC, and its mainnet vaults take real deposits from $100. Ebbryn plans against IXS's live testnet vaults and builds and checks the exact approve and deposit, but a wallet can't fund them on testnet.
 - Withdrawals are planned, not automated. You come back on the date and sign, with an "Add to calendar" reminder.
 - Mainnet IXS vaults require IXS verification (KYC).
 - Setup and plans are stored in your browser. There are no accounts.

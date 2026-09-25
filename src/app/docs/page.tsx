@@ -150,7 +150,7 @@ export default function DocsPage() {
         <li>
           Get a little test BNB for network fees from the <a href="https://www.bnbchain.org/en/testnet-faucet" target="_blank" rel="noreferrer">BNB Chain testnet faucet</a>.
         </li>
-        <li>You also need IXS test USDC. Only IXS can issue it, so without it you can review the moves but not send them.</li>
+        <li>Sending a deposit needs IXS test USDC, which IXS doesn’t issue publicly. You can review the exact moves and connect a wallet, but not broadcast them on testnet.</li>
       </ol>
       <h3>Sign the moves</h3>
       <ol>

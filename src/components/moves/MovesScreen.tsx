@@ -376,7 +376,7 @@ export function MovesScreen() {
         <p className="rounded-[12px] p-4 text-[15px] text-ink" style={{ boxShadow: "inset 0 0 0 1px #b3261e" }}>
           This wallet has {formatUsdc(balance!)} IXS test USDC on {networkCopy(moves[0].network)}. You need {formatUsdc(need)} USDC to complete this deposit.
           <span className="mt-2 block text-[13px] text-charcoal">
-            Awaiting sponsor test funds: only IXS can mint its test USDC, and the request is open in IXS issue #5. The steps below are built by IXS and checked, but can&apos;t be broadcast until the wallet is funded.
+            IXS doesn&apos;t issue its test USDC publicly, so this testnet deposit can&apos;t be sent. The steps below are built by IXS and checked, exactly as they would be signed.
           </span>
         </p>
       )}
