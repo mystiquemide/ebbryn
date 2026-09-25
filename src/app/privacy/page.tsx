@@ -25,7 +25,7 @@ export default function PrivacyPage() {
     <DocPage
       label="Privacy"
       title="Privacy policy"
-      intro={<p>Ebbryn has no accounts, no cookies and no analytics. This page explains the little data that does move, and where it goes.</p>}
+      intro={<p>Ebbryn has no accounts and no analytics. This page explains the little data that does move, and where it goes.</p>}
       updated="September 24, 2026"
       toc={TOC}
     >
@@ -35,6 +35,7 @@ export default function PrivacyPage() {
         <li>When you ask for a plan, your balance, payouts and rules are sent to SERV Reasoning by OpenServ to produce it.</li>
         <li>When you review moves, your wallet address is sent to IXS to build the transactions.</li>
         <li>Your IP address is used briefly for rate limiting and appears in standard hosting logs.</li>
+        <li>If you open Ebbryn through the link we shared with hackathon reviewers, a cookie marks that visit. Nobody else gets one.</li>
         <li>We never ask for your name, email, or private keys, and we don’t sell data.</li>
       </ul>
 
@@ -84,7 +85,11 @@ export default function PrivacyPage() {
         </table>
       </div>
       <p>
-        Ebbryn does not use cookies, tracking pixels or analytics. Fonts are served from our own domain. The only thing we write to your device is local storage for the items above.
+        Ebbryn does not use tracking pixels or analytics. Fonts are served from our own domain.
+      </p>
+      <h3>Review links</h3>
+      <p>
+        If you open Ebbryn through the link we shared with hackathon reviewers, we set one cookie with a random ID for 30 days. While it’s set, the pages you view and whether your plans passed are sent to the maintainer’s Telegram, with your browser, operating system and country (from the hosting provider). This shows us what reviewers tried and whether it worked. It holds no name, email, wallet address or plan inputs. Visitors who arrive any other way get no cookie and are not tracked. Clear this site’s cookies to stop it.
       </p>
 
       <h2 id="share">Who receives it</h2>

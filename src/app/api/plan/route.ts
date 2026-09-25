@@ -6,6 +6,7 @@ import { cacheGet, cacheSet, takeSharedPlanSlot } from "@/lib/ratelimit";
 import { expandSchedule } from "@/lib/schedule";
 import { requestPlanHedged, ServError, type ServMeta } from "@/lib/serv";
 import { canonical, signPayload } from "@/lib/sign";
+import { beacon, reviewId } from "@/server/beacon";
 
 export const maxDuration = 300;
 
@@ -73,10 +74,14 @@ export async function POST(req: Request) {
       vaults,
     };
     cacheSet(cacheKey, body);
+    const rid = reviewId(req.headers.get("cookie"));
+    if (rid) await beacon(`Ebbryn review ${rid}: plan ${check.ok ? `passed ${check.passed.length}/8` : `rejected (${check.failures.map((f) => f.code).join(", ")})`}, SERV ${meta.requestId?.slice(0, 8) ?? "?"}`);
     return Response.json(body);
   } catch (e) {
     // Details stay in server logs. Users get what happened and what to do.
     console.error(e);
+    const rid = reviewId(req.headers.get("cookie"));
+    if (rid) await beacon(`Ebbryn review ${rid}: plan failed (${e instanceof Error ? e.message.slice(0, 80) : "unknown error"})`);
     if (e instanceof IxsError) {
       return Response.json({ error: "IXS didn't answer in time, so Ebbryn couldn't check the vaults. Nothing was changed. Try again in a minute." }, { status: 502 });
     }
