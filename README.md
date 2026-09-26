@@ -98,17 +98,21 @@ API notes from building: a system message is required, `temperature` isn't suppo
 
 ### IXS Finance
 
+Ebbryn runs against IXS's dev environment (`api-dev-v2.ixs.finance`), the one published in IXS's [agent skills repo](https://github.com/IXS-Finance/ixs-rwa-agent-skills).
+
 | What | Detail |
 |---|---|
-| Vault discovery | REST `GET https://api-dev-v2.ixs.finance/vaults`, in [`src/lib/ixs.ts`](src/lib/ixs.ts) |
+| Vault discovery | REST `GET /vaults`, in [`src/lib/ixs.ts`](src/lib/ixs.ts) |
 | Vault details | MCP `vault_get` for settlement type (instant or by request) |
 | Deposits open? | MCP `vault_build_request_deposit` with a probe address. If IXS refuses, the vault is marked paused and SERV can't park there |
-| Transactions | MCP `vault_build_request_deposit` for the real approve and deposit, in base units |
-| Target vault | IXHYB - BSC `0xCb09a5326AEFD705d14FF4C5ca2beD7086ba0Dcc`, BSC testnet (chain 97), withdraw anytime |
+| Transactions | MCP `vault_build_request_deposit` builds the real approve and deposit, in base units, which Ebbryn verifies before you sign |
+| Vault used | IXHYB - BSC `0xCb09a5326AEFD705d14FF4C5ca2beD7086ba0Dcc` on BSC testnet (chain 97), the only dev vault that accepts deposit builds |
 
-Found while building and reported in [IXS-Finance/ixs-rwa-agent-skills#5](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5): the Avalanche and Arc vaults accept no deposits, `vault_request_status` errors, parallel MCP calls hang, and `vaults_list` returns a subset. Ebbryn queues MCP calls one at a time, retries once on timeout, and reads discovery from REST.
+**What doesn't work, and why.** IXS confirmed during the hackathon that this testnet is internal and its test USDC isn't public, so the deposit Ebbryn builds can be reviewed and connected to a wallet but not funded or sent. Its other testnet vaults (Avalanche, Arc) don't accept deposits for the same reason.
 
-**Testnet and mainnet.** IXS's testnet is internal with no public test USDC, so Ebbryn builds and checks the testnet deposit but can't send it. IXS's mainnet vaults (BSC `0xc975a3EeF2e49F8eDdEf585340C43f15300fCB82`, Avalanche `0xaD01573b459805E3954398796203d830B57A8bD9`) need no whitelist and, per IXS, take real USDC from $100. When we checked on Sep 25, both reported a deposit limit of 0, so mainnet deposits depend on IXS opening them. Pointing Ebbryn at mainnet is a network and API switch, not a redesign.
+**Path to mainnet.** IXS's mainnet vaults (BSC `0xc975a3EeF2e49F8eDdEf585340C43f15300fCB82`, Avalanche `0xaD01573b459805E3954398796203d830B57A8bD9`) need no whitelist and, per IXS, take real USDC from $100. When we checked on Sep 25, both reported a deposit limit of 0. Pointing Ebbryn at them is a network and API switch, not a redesign.
+
+**Integration notes.** Parallel MCP calls to the dev server hang, `vaults_list` returns a subset, and `vault_request_status` errors, so Ebbryn queues MCP calls one at a time, retries once on timeout, and reads discovery from REST. Details in [IXS-Finance/ixs-rwa-agent-skills#5](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5).
 
 ## The eight checks
 
@@ -150,7 +154,7 @@ First customers: non-US companies paying 10 to 50 contractors in USDC, and opera
 ## Limitations
 
 - Hackathon code, unaudited, testnet only. Don't use it with real funds.
-- No deposit is broadcast. The testnet deposit is built and checked but can't be funded (see [Testnet and mainnet](#ixs-finance)).
+- No deposit is broadcast. The testnet deposit is built and checked but can't be funded (see [IXS Finance](#ixs-finance)).
 - Withdrawals are planned, not automated. You come back on the date and sign, with an "Add to calendar" reminder.
 - Mainnet IXS vaults take real USDC, from $100 per IXS.
 - Setup and plans are stored in your browser. There are no accounts.
