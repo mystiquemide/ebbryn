@@ -198,7 +198,7 @@ export default function DocsPage() {
             </tr>
             <tr>
               <th>Network</th>
-              <td>Testnet only. Mainnet IXS vaults require IXS verification.</td>
+              <td>Testnet only. IXS mainnet vaults take real USDC, from $100 per IXS.</td>
             </tr>
             <tr>
               <th>Your data</th>

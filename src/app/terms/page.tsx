@@ -58,7 +58,7 @@ export default function TermsPage() {
 
       <h2 id="testnet">Testnet only</h2>
       <p>
-        Ebbryn works with testnet vaults and test tokens that have no real value. The code hasn’t been audited. Don’t use it with real funds or on mainnet. Mainnet IXS vaults require IXS’s own verification and are outside Ebbryn.
+        Ebbryn works with testnet vaults and test tokens that have no real value. The code hasn’t been audited. Don’t use it with real funds or on mainnet. IXS’s mainnet vaults take real funds and are outside this build.
       </p>
 
       <h2 id="responsibilities">Your responsibilities</h2>

@@ -36,7 +36,7 @@ async function VaultList() {
   const { vaults, asOf, live } = await listVaultsForDisplay();
   const open = vaults.filter((v) => v.acceptsDeposits);
   const paused = vaults.filter((v) => !v.acceptsDeposits);
-  const note = `${live ? "Live from IXS testnet" : asOfCopy(asOf)}. Mainnet access requires IXS verification.`;
+  const note = `${live ? "Live from IXS testnet" : asOfCopy(asOf)}. Testnet vaults: deposits are built and checked, not sent.`;
 
   return (
     <Panel note={note}>
@@ -84,7 +84,7 @@ export function Vaults() {
         </p>
         <Suspense
           fallback={
-            <Panel note="Mainnet access requires IXS verification.">
+            <Panel note="Testnet vaults: deposits are built and checked, not sent.">
               <p className="px-6 py-8 text-[16px] text-charcoal">Reading IXS vaults.</p>
             </Panel>
           }

@@ -6,7 +6,7 @@
 [![IXS vault on BSC testnet](https://img.shields.io/badge/BSC%20testnet-IXS%20vault-F0B90B)](https://testnet.bscscan.com/address/0xCb09a5326AEFD705d14FF4C5ca2beD7086ba0Dcc)
 [![SERV Hackathon](https://img.shields.io/badge/built%20for-SERV%20Hackathon%20Ed.01-18181b)](https://www.openserv.ai/hackathon)
 
-**Cash that comes back on time.** Ebbryn parks the USDC a business holds for payroll in IXS RWA vaults and brings it back before each payout. SERV plans it, code checks it, and you sign every move.
+**Cash that comes back on time.** Ebbryn plans how much of a business's payroll USDC to park in IXS RWA vaults and when to bring it back before each payout. SERV plans it, code checks it, IXS builds the transactions, and you sign every move.
 
 Built for the OpenServ SERV Hackathon, Edition 01, Open Track.
 
@@ -37,7 +37,7 @@ A plan that passes all eight checks is signed by the server, IXS builds the unsi
 No install needed. Open [ebbryn.midelabs.xyz](https://ebbryn.midelabs.xyz/?via=gh) and:
 
 1. Click **See a real plan** to watch the eight checks reject the recorded SERV plan that counted payroll twice.
-2. Click **Plan my cash**, keep the Payroll team template, and click **Plan my cash** again. A live SERV plan comes back in about 40 seconds to 2 minutes, with a 30-day chart, SERV's reasons and the check results.
+2. Click **Plan my cash**, keep the Payroll team template, and click **Plan my cash** again. A live SERV plan usually comes back in under a minute, sometimes up to two, with a 30-day chart, SERV's reasons and the check results.
 3. Change a rule, for example "keep at least half the balance ready", and plan again. The reasons quote the rule you changed.
 4. Click **Review moves** and connect a browser wallet on BSC testnet. You see the exact approve and deposit you would sign, plus a calendar reminder for each withdrawal date.
 
@@ -108,7 +108,7 @@ API notes from building: a system message is required, `temperature` isn't suppo
 
 Found while building and reported in [IXS-Finance/ixs-rwa-agent-skills#5](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5): the Avalanche and Arc vaults accept no deposits, `vault_request_status` errors, parallel MCP calls hang, and `vaults_list` returns a subset. Ebbryn queues MCP calls one at a time, retries once on timeout, and reads discovery from REST.
 
-**What works and what's next.** Ebbryn reads IXS's vault API and uses IXS MCP to build the exact approve and deposit, verified before you sign. IXS's testnet is internal with no public test USDC, so testnet deposits can't be funded. IXS mainnet vaults (BSC `0xc975a3EeF2e49F8eDdEf585340C43f15300fCB82`, Avalanche `0xaD01573b459805E3954398796203d830B57A8bD9`) accept real deposits from $100. Pointing Ebbryn at them is a network and API switch, not a redesign.
+**Testnet and mainnet.** IXS's testnet is internal with no public test USDC, so Ebbryn builds and checks the testnet deposit but can't send it. IXS's mainnet vaults (BSC `0xc975a3EeF2e49F8eDdEf585340C43f15300fCB82`, Avalanche `0xaD01573b459805E3954398796203d830B57A8bD9`) need no whitelist and, per IXS, take real USDC from $100. When we checked on Sep 25, both reported a deposit limit of 0, so mainnet deposits depend on IXS opening them. Pointing Ebbryn at mainnet is a network and API switch, not a redesign.
 
 ## The eight checks
 
@@ -150,9 +150,9 @@ First customers: non-US companies paying 10 to 50 contractors in USDC, and opera
 ## Limitations
 
 - Hackathon code, unaudited, testnet only. Don't use it with real funds.
-- No deposit is broadcast. IXS confirmed its testnet is internal and has no public test USDC, and its mainnet vaults take real deposits from $100. Ebbryn plans against IXS's live testnet vaults and builds and checks the exact approve and deposit, but a wallet can't fund them on testnet.
+- No deposit is broadcast. The testnet deposit is built and checked but can't be funded (see [Testnet and mainnet](#ixs-finance)).
 - Withdrawals are planned, not automated. You come back on the date and sign, with an "Add to calendar" reminder.
-- Mainnet IXS vaults require IXS verification (KYC).
+- Mainnet IXS vaults take real USDC, from $100 per IXS.
 - Setup and plans are stored in your browser. There are no accounts.
 
 ## Run it locally

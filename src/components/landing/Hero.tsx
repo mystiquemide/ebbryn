@@ -47,7 +47,7 @@ export function Hero() {
             </Link>
           </div>
           <p style={{ "--d": "760ms" } as React.CSSProperties} className="fade-up num text-[12px] uppercase tracking-[0.24px] text-slate">SERV plans. Code checks. IXS builds. You sign.</p>
-          <p style={{ "--d": "820ms" } as React.CSSProperties} className="fade-up text-[13px] text-slate">Testnet. IXS vaults need verification on mainnet.</p>
+          <p style={{ "--d": "820ms" } as React.CSSProperties} className="fade-up text-[13px] text-slate">Testnet build. Deposits are built and checked, not sent.</p>
         </div>
 
         <div style={{ "--d": "300ms" } as React.CSSProperties} className="fade-up">
