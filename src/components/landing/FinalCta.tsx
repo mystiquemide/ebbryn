@@ -1,6 +1,5 @@
 /* eslint-disable @next/next/no-img-element -- plain img with a hand-written srcSet for one static photo. */
 import Link from "next/link";
-import { REPO_URL } from "@/lib/site";
 import { Arrow } from "../SiteNav";
 
 // Photo: https://unsplash.com/photos/waves-in-the-ocean-cFALQAMJJEY by Zac Gudakov (Unsplash License), self-hosted.
@@ -31,11 +30,6 @@ export function FinalCta() {
               Plan my cash
               <Arrow />
             </Link>
-            {REPO_URL && (
-              <a href={REPO_URL} target="_blank" rel="noreferrer" className="btn btn-translucent rounded-[16px] px-[22px] py-[14px]">
-                Read the code
-              </a>
-            )}
           </div>
         </div>
       </div>
