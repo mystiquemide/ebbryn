@@ -39,7 +39,7 @@ No install needed. Open [ebbryn.midelabs.xyz](https://ebbryn.midelabs.xyz/?via=g
 1. Click **See a real plan** to watch the eight checks reject the recorded SERV plan that counted payroll twice.
 2. Click **Plan my cash**, keep the Payroll team template, and click **Plan my cash** again. A live SERV plan usually comes back in under a minute, sometimes up to two, with a 30-day chart, SERV's reasons and the check results.
 3. Change a rule, for example "keep at least half the balance ready", and plan again. The reasons quote the rule you changed.
-4. Click **Review moves** and connect a browser wallet. You see the real mainnet approve and deposit IXS built for its live BSC vault, checked by Ebbryn, plus a calendar reminder for each withdrawal date. Signing is turned off on mainnet, so nothing can be sent.
+4. Click **Review moves** and connect a browser wallet. You see the real mainnet approve and deposit IXS built for its live BSC vault, checked by Ebbryn, plus a calendar reminder for each withdrawal date. Signing is locked on this public demo, so no one's real money moves by accident.
 
 Planning uses shared SERV credits, so it's limited to 5 plans per IP every 10 minutes.
 
@@ -142,7 +142,7 @@ Every plan runs through [`src/lib/check.ts`](src/lib/check.ts). One failure lock
 
 Lint, typecheck, 39 tests and a production build run on every push in [CI](.github/workflows/ci.yml).
 
-![Mainnet preview: the real IXS approve and deposit for the live BSC vault, with signing turned off](.github/assets/moves.png)
+![Mainnet preview: the real IXS approve and deposit for the live BSC vault, with signing locked on the public demo](.github/assets/moves.png)
 
 ## Business model
 
@@ -156,6 +156,15 @@ First customers: non-US companies paying 10 to 50 contractors in USDC, and opera
 - No deposit has been broadcast. IXS's minimum is $100 of real USDC and its testnet has no public test USDC (see [IXS Finance](#ixs-finance)).
 - Withdrawals are planned, not automated. You come back on the date and sign, with an "Add to calendar" reminder.
 - Setup and plans are stored in your browser. There are no accounts.
+
+## Roadmap
+
+- **Signed mainnet deposits.** Unlock signing per user, starting with IXS's $100 minimum and a user-set cap, after a security review.
+- **Request and claim flow.** Support IXS's async ERC-7540 vaults (request a deposit or redemption, then claim when IXS settles), so the Avalanche vaults can be used.
+- **Withdrawal reminders that reach you.** Email or Telegram alerts on each withdrawal date, on top of the calendar file.
+- **More vaults.** Plan across several IXS vaults and chains, weighing yield, withdrawal time and concentration.
+- **Payroll imports.** Pull upcoming payouts from payroll and invoicing tools instead of typing them in.
+- **An API for agents.** Let AI agents ask Ebbryn for a checked plan before they move treasury funds.
 
 ## Run it locally
 
