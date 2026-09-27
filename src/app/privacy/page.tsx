@@ -30,6 +30,7 @@ export default function PrivacyPage() {
       intro={<p>Ebbryn has no accounts and no analytics. This page explains the little data that does move, and where it goes.</p>}
       updated="September 24, 2026"
       toc={TOC}
+      footer={false}
     >
       <h2 id="summary">Summary</h2>
       <ul>

@@ -33,6 +33,7 @@ export default function TermsPage() {
       intro={<p>The short version: Ebbryn is an unaudited preview tool that can’t send real funds. It proposes plans, you decide and sign, and you use it at your own risk.</p>}
       updated="September 24, 2026"
       toc={TOC}
+      footer={false}
     >
       <h2 id="agreement">Agreement</h2>
       <p>
