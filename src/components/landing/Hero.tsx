@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { IXS_NETWORK } from "@/lib/network";
 import { Suspense } from "react";
 import { HeroVaults, HeroVaultsLoading } from "../HeroVaults";
 import { Arrow } from "../SiteNav";
@@ -47,7 +48,7 @@ export function Hero() {
             </Link>
           </div>
           <p style={{ "--d": "760ms" } as React.CSSProperties} className="fade-up num text-[12px] uppercase tracking-[0.24px] text-slate">SERV plans. Code checks. IXS builds. You sign.</p>
-          <p style={{ "--d": "820ms" } as React.CSSProperties} className="fade-up text-[13px] text-slate">Testnet build. Deposits are built and checked, not sent.</p>
+          <p style={{ "--d": "820ms" } as React.CSSProperties} className="fade-up text-[13px] text-slate">{IXS_NETWORK === "mainnet" ? "Live IXS mainnet vaults. Transactions are built and checked, never signed here." : "Testnet build. Deposits are built and checked, not sent."}</p>
         </div>
 
         <div style={{ "--d": "300ms" } as React.CSSProperties} className="fade-up">

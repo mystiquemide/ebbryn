@@ -71,7 +71,7 @@ export default function PrivacyPage() {
             <tr>
               <td>Wallet address</td>
               <td>You connect a wallet and review moves</td>
-              <td>Not stored by us. Sent to IXS and the BSC testnet RPC to build transactions and read balances.</td>
+              <td>Not stored by us. Sent to IXS and a public BNB Chain RPC to build transactions and read balances.</td>
             </tr>
             <tr>
               <td>Transaction hashes</td>
@@ -123,7 +123,7 @@ export default function PrivacyPage() {
               <td>To build the unsigned vault transactions</td>
             </tr>
             <tr>
-              <td>BNB Chain testnet RPC</td>
+              <td>BNB Chain RPC</td>
               <td>Wallet address</td>
               <td>To read your USDC, BNB and allowance, directly from your browser</td>
             </tr>

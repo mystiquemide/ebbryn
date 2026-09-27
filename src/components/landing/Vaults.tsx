@@ -1,7 +1,11 @@
 import { Suspense } from "react";
+import { IXS_LABEL, IXS_NETWORK } from "@/lib/network";
 import { listVaultsForDisplay } from "@/lib/ixs";
 import type { VaultInfo } from "@/lib/plan";
 import { asOfCopy, networkCopy, withdrawalCopy } from "@/lib/vaultCopy";
+
+const PREVIEW_NOTE =
+  IXS_NETWORK === "mainnet" ? "Real vaults: transactions are built and checked, never signed here." : "Testnet vaults: deposits are built and checked, not sent.";
 
 function Deposits({ v }: { v: VaultInfo }) {
   return (
@@ -36,7 +40,7 @@ async function VaultList() {
   const { vaults, asOf, live } = await listVaultsForDisplay();
   const open = vaults.filter((v) => v.acceptsDeposits);
   const paused = vaults.filter((v) => !v.acceptsDeposits);
-  const note = `${live ? "Live from IXS testnet" : asOfCopy(asOf)}. Testnet vaults: deposits are built and checked, not sent.`;
+  const note = `${live ? `Live from ${IXS_LABEL}` : asOfCopy(asOf)}. ${PREVIEW_NOTE}`;
 
   return (
     <Panel note={note}>
@@ -84,7 +88,7 @@ export function Vaults() {
         </p>
         <Suspense
           fallback={
-            <Panel note="Testnet vaults: deposits are built and checked, not sent.">
+            <Panel note={PREVIEW_NOTE}>
               <p className="px-6 py-8 text-[16px] text-charcoal">Reading IXS vaults.</p>
             </Panel>
           }

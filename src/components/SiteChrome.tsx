@@ -38,7 +38,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-steel">
         <div className="container-page flex py-6 text-[12px] text-slate md:justify-end">
-        <span className="num">Testnet only. Not financial advice.</span>
+        <span className="num">Preview only, no signing on mainnet. Not financial advice.</span>
         </div>
       </div>
     </footer>

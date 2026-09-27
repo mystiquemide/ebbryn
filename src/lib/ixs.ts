@@ -1,7 +1,12 @@
 import snapshot from "@/data/ixs-vaults.snapshot.json";
+import { IXS_NETWORK, isMainnetChain } from "./network";
 import type { Settlement, VaultInfo } from "./plan";
 
-const MCP_URL = process.env.IXS_MCP_URL ?? "https://api-dev-v2.ixs.finance/mcp";
+// Mainnet ignores IXS_MCP_URL (set to the dev server in older deployments) and uses the production MCP.
+const MCP_URL =
+  IXS_NETWORK === "mainnet"
+    ? (process.env.IXS_MCP_URL_MAINNET ?? "https://api-v2.ixs.finance/mcp")
+    : (process.env.IXS_MCP_URL ?? "https://api-dev-v2.ixs.finance/mcp");
 // Discovery uses the REST list: MCP vaults_list only returns a subset of vaults.
 const API_BASE = MCP_URL.replace(/\/mcp$/, "");
 const ASYNC_LAG_DAYS = Number(process.env.IXS_ASYNC_LAG_DAYS ?? 2);
@@ -77,9 +82,12 @@ type VaultGet = { ok: boolean; settlement: Settlement; vault: RawVault; pricing?
 
 export function toVaultInfo(raw: RawVault, settlement: Settlement, acceptsDeposits: boolean): VaultInfo {
   const explorer = raw.explorerUrl.replace(/\/address\/.*$/, "");
+  // Mainnet vaults all share one IXS name, so label them by chain (and whitelist) the way the dev vaults are.
+  const chain = raw.chainId === 56 ? "BSC" : raw.chainId === 43114 ? "Avalanche" : raw.network;
+  const name = IXS_NETWORK === "mainnet" ? `IXHYB - ${chain}${raw.requiresWhitelist ? " (whitelist)" : ""}` : raw.name;
   return {
     id: raw.routeId,
-    name: raw.name,
+    name,
     network: raw.network,
     chainId: raw.chainId,
     address: raw.contractAddress,
@@ -114,7 +122,10 @@ export async function listVaults(): Promise<VaultInfo[]> {
   });
   if (!res.ok) throw new IxsError(`IXS vault list failed with HTTP ${res.status}`);
   const list = (await res.json()) as { items?: RawVault[] };
-  const items = (list.items ?? []).filter((v) => (v.status ?? "active") === "active" && /testnet/.test(v.network));
+  // Testnet: IXS's dev vaults. Mainnet: production vaults on chains Ebbryn supports (BSC, Avalanche).
+  const items = (list.items ?? []).filter(
+    (v) => (v.status ?? "active") === "active" && (IXS_NETWORK === "mainnet" ? isMainnetChain(v.chainId) : /testnet/.test(v.network)),
+  );
   const vaults: VaultInfo[] = [];
   for (const raw of items) {
     const detail = await mcpCall<VaultGet>("vault_get", { vaultId: raw.routeId });
@@ -128,7 +139,9 @@ export async function listVaults(): Promise<VaultInfo[]> {
 export type VaultDisplay = { vaults: VaultInfo[]; asOf: string; live: boolean };
 
 // Real IXS data captured from the live API, used only for display when IXS is not answering.
-let lastGood: { vaults: VaultInfo[]; asOf: string } = snapshot as { vaults: VaultInfo[]; asOf: string };
+// The committed snapshot is testnet data, so mainnet starts empty rather than showing the wrong network.
+let lastGood: { vaults: VaultInfo[]; asOf: string } =
+  IXS_NETWORK === "mainnet" ? { vaults: [], asOf: new Date(0).toISOString() } : (snapshot as { vaults: VaultInfo[]; asOf: string });
 
 // For marketing surfaces only. Planning and moves always call listVaults() and fail closed.
 export async function listVaultsForDisplay(): Promise<VaultDisplay> {

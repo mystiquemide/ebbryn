@@ -3,7 +3,7 @@
 [![CI](https://github.com/mystiquemide/ebbryn/actions/workflows/ci.yml/badge.svg)](https://github.com/mystiquemide/ebbryn/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 [![Live demo](https://img.shields.io/badge/demo-ebbryn.midelabs.xyz-94faf0.svg)](https://ebbryn.midelabs.xyz/?via=gh)
-[![IXS vault on BSC testnet](https://img.shields.io/badge/BSC%20testnet-IXS%20vault-F0B90B)](https://testnet.bscscan.com/address/0xCb09a5326AEFD705d14FF4C5ca2beD7086ba0Dcc)
+[![IXS vault on BSC mainnet](https://img.shields.io/badge/BSC%20mainnet-IXS%20vault-F0B90B)](https://bscscan.com/address/0xc975a3EeF2e49F8eDdEf585340C43f15300fCB82)
 [![SERV Hackathon](https://img.shields.io/badge/built%20for-SERV%20Hackathon%20Ed.01-18181b)](https://www.openserv.ai/hackathon)
 
 **Cash that comes back on time.** Ebbryn plans how much of a business's payroll USDC to park in IXS RWA vaults and when to bring it back before each payout. SERV plans it, code checks it, IXS builds the transactions, and you sign every move.
@@ -28,7 +28,7 @@ The model is never trusted on its own. In testing, SERV kept 8,000 USDC ready fo
 
 ![A SERV plan rejected by Ebbryn's checks](.github/assets/rejected.png)
 
-A plan that passes all eight checks is signed by the server, IXS builds the unsigned transactions, and you sign them in your own wallet. Ebbryn never holds keys or funds.
+A plan that passes all eight checks is signed by the server and IXS builds the unsigned transactions for its live mainnet vault. On the live site they're shown and checked but can't be signed; in testnet mode you sign them in your own wallet. Ebbryn never holds keys or funds.
 
 ![A live plan that passed all eight checks](.github/assets/plan.png)
 
@@ -39,7 +39,7 @@ No install needed. Open [ebbryn.midelabs.xyz](https://ebbryn.midelabs.xyz/?via=g
 1. Click **See a real plan** to watch the eight checks reject the recorded SERV plan that counted payroll twice.
 2. Click **Plan my cash**, keep the Payroll team template, and click **Plan my cash** again. A live SERV plan usually comes back in under a minute, sometimes up to two, with a 30-day chart, SERV's reasons and the check results.
 3. Change a rule, for example "keep at least half the balance ready", and plan again. The reasons quote the rule you changed.
-4. Click **Review moves** and connect a browser wallet on BSC testnet. You see the exact approve and deposit you would sign, plus a calendar reminder for each withdrawal date.
+4. Click **Review moves** and connect a browser wallet. You see the real mainnet approve and deposit IXS built for its live BSC vault, checked by Ebbryn, plus a calendar reminder for each withdrawal date. Signing is turned off on mainnet, so nothing can be sent.
 
 Planning uses shared SERV credits, so it's limited to 5 plans per IP every 10 minutes.
 
@@ -51,7 +51,7 @@ sequenceDiagram
     participant App as Ebbryn server
     participant IXS as IXS REST + MCP
     participant SERV as SERV Reasoning
-    participant Chain as BSC testnet
+    participant Chain as BSC
 
     You->>App: Balance, payouts, rules, hard limits
     App->>IXS: Read live vaults and which accept deposits
@@ -66,7 +66,7 @@ sequenceDiagram
     IXS-->>App: Transactions
     App->>App: Verify contract and approve amount
     App-->>You: Exact transactions to sign
-    You->>Chain: Sign and send from your own wallet
+    You->>Chain: Sign and send (testnet mode only)
 ```
 
 | Step | Who decides | What happens |
@@ -98,19 +98,17 @@ API notes from building: a system message is required, `temperature` isn't suppo
 
 ### IXS Finance
 
-Ebbryn runs against IXS's dev environment (`api-dev-v2.ixs.finance`), the one published in IXS's [agent skills repo](https://github.com/IXS-Finance/ixs-rwa-agent-skills).
+The live site runs a **mainnet preview**: Ebbryn reads IXS's production API and real vaults, plans against them, and has IXS build the real mainnet transactions. Signing is turned off on mainnet in code ([`src/lib/wallet.ts`](src/lib/wallet.ts) refuses chain 56 and 43114), so nothing can move real funds. Set `IXS_NETWORK=testnet` to run against IXS's dev environment instead.
 
 | What | Detail |
 |---|---|
-| Vault discovery | REST `GET /vaults`, in [`src/lib/ixs.ts`](src/lib/ixs.ts) |
+| Vault discovery | REST `GET /vaults` on `api-v2.ixs.finance` (mainnet) or `api-dev-v2.ixs.finance` (testnet), in [`src/lib/ixs.ts`](src/lib/ixs.ts) |
 | Vault details | MCP `vault_get` for settlement type (instant or by request) |
-| Deposits open? | MCP `vault_build_request_deposit` with a probe address. If IXS refuses, the vault is marked paused and SERV can't park there |
-| Transactions | MCP `vault_build_request_deposit` builds the real approve and deposit, in base units, which Ebbryn verifies before you sign |
-| Vault used | IXHYB - BSC `0xCb09a5326AEFD705d14FF4C5ca2beD7086ba0Dcc` on BSC testnet (chain 97), the only dev vault that accepts deposit builds |
+| Deposits open? | MCP `vault_build_request_deposit` with a probe address. If IXS refuses, the vault is marked closed and SERV can't park there |
+| Transactions | MCP `vault_build_request_deposit` builds the real approve and deposit, in base units, which Ebbryn verifies before showing |
+| Mainnet vaults | IXHYB - BSC [`0xc975a3EeF2e49F8eDdEf585340C43f15300fCB82`](https://bscscan.com/address/0xc975a3EeF2e49F8eDdEf585340C43f15300fCB82) (open, withdraw anytime), plus Avalanche and whitelisted vaults IXS lists as closed |
 
-**What doesn't work, and why.** IXS confirmed during the hackathon that this testnet is internal and its test USDC isn't public, so the deposit Ebbryn builds can be reviewed and connected to a wallet but not funded or sent. Its other testnet vaults (Avalanche, Arc) don't accept deposits for the same reason.
-
-**Path to mainnet.** IXS's mainnet vaults (BSC `0xc975a3EeF2e49F8eDdEf585340C43f15300fCB82`, Avalanche `0xaD01573b459805E3954398796203d830B57A8bD9`) need no whitelist and, per IXS, take real USDC from $100. When we checked on Sep 25, both reported a deposit limit of 0. Pointing Ebbryn at them is a network and API switch, not a redesign.
+**Why a preview and not a real deposit.** IXS's mainnet vaults take real USDC from $100, and IXS confirmed its testnet is internal with no public test USDC. Ebbryn shows exactly what a treasury would sign on mainnet without moving anyone's money. On Sep 25 both mainnet vaults reported a deposit limit of 0; by Sep 27 IXS had opened the BSC vault and its MCP built real deposits for it.
 
 **Integration notes.** Parallel MCP calls to the dev server hang, `vaults_list` returns a subset, and `vault_request_status` errors, so Ebbryn queues MCP calls one at a time, retries once on timeout, and reads discovery from REST. Details in [IXS-Finance/ixs-rwa-agent-skills#5](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5).
 
@@ -136,12 +134,13 @@ Every plan runs through [`src/lib/check.ts`](src/lib/check.ts). One failure lock
 | SERV counts the same payroll twice | Rejected by `COVER_ONCE` and `LIQUID_COVER`, moves locked | [`serv-double-count.json`](src/fixtures/serv-double-count.json), [`check.test.ts`](src/lib/check.test.ts) |
 | Payroll plan on the live URL | 8 of 8 on the first attempt: 81,600 ready, 46,801 parked, 42,000 withdrawn Oct 14 for the Oct 15 payroll | SERV request `4e20751a-7866-4b12-ac69-4fa3eec5aca8` |
 | Rules text says "park 100%" | `CAP` fails, hard limits win | [`check.test.ts`](src/lib/check.test.ts) |
+| Real mainnet transactions | IXS built an exact USDC approve and a deposit into the live BSC vault `0xc975…fCB82`; the Moves screen keeps both unsigned | [`src/lib/network.ts`](src/lib/network.ts), [`network.test.ts`](src/lib/network.test.ts) |
 | Plan edited in the browser | `/api/moves` returns 400, nothing built | [`guard.test.ts`](src/lib/guard.test.ts) |
 | Planning spammed from one IP | 429 after 5 plans in 10 minutes, 200 a day, counted in Redis across server instances | [`guard.test.ts`](src/lib/guard.test.ts), [`ratelimit.ts`](src/lib/ratelimit.ts) |
 | Chart honesty | Wallet never negative, ready + parked + paid always equals the balance | [`timeline.test.ts`](src/lib/timeline.test.ts) |
 | USDC conversion | 75,600 USDC becomes `75600000000` base units with no float error | [`units.test.ts`](src/lib/units.test.ts) |
 
-Lint, typecheck, 37 tests and a production build run on every push in [CI](.github/workflows/ci.yml).
+Lint, typecheck, 39 tests and a production build run on every push in [CI](.github/workflows/ci.yml).
 
 ![Moves screen with the exact deposit and a withdrawal reminder](.github/assets/moves.png)
 
@@ -153,10 +152,9 @@ First customers: non-US companies paying 10 to 50 contractors in USDC, and opera
 
 ## Limitations
 
-- Hackathon code, unaudited, testnet only. Don't use it with real funds.
-- No deposit is broadcast. The testnet deposit is built and checked but can't be funded (see [IXS Finance](#ixs-finance)).
+- Hackathon code, unaudited. Mainnet is preview only: real vaults and real transactions, signing turned off.
+- No deposit has been broadcast. IXS's minimum is $100 of real USDC and its testnet has no public test USDC (see [IXS Finance](#ixs-finance)).
 - Withdrawals are planned, not automated. You come back on the date and sign, with an "Add to calendar" reminder.
-- Mainnet IXS vaults take real USDC, from $100 per IXS.
 - Setup and plans are stored in your browser. There are no accounts.
 
 ## Run it locally
@@ -176,8 +174,9 @@ npm run dev                  # http://localhost:3000
 | `SERV_API_KEY` | Yes | SERV Reasoning API key |
 | `PLAN_SIGNING_SECRET` | Yes | 32+ characters, signs passing plans |
 | `SERV_MODEL` | No | Defaults to `gpt-6-luna-serv-kronos-multipath` |
-| `IXS_MCP_URL` | No | Defaults to the IXS testnet MCP |
-| `NEXT_PUBLIC_BSC_TESTNET_RPC` | No | RPC for balance and allowance reads |
+| `IXS_NETWORK` | No | `mainnet` (preview, signing off) or `testnet` (IXS dev environment). Defaults to `testnet` |
+| `IXS_MCP_URL` | No | Testnet MCP override. Mainnet uses `api-v2.ixs.finance/mcp` |
+| `NEXT_PUBLIC_BSC_RPC`, `NEXT_PUBLIC_BSC_TESTNET_RPC` | No | RPCs for balance and allowance reads |
 | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | No | Upstash Redis for shared rate limits. Falls back to in-memory |
 
 The API can be used without the UI:

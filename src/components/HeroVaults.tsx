@@ -1,4 +1,5 @@
 import { listVaultsForDisplay } from "@/lib/ixs";
+import { IXS_LABEL } from "@/lib/network";
 import { asOfCopy } from "@/lib/vaultCopy";
 import type { VaultInfo } from "@/lib/plan";
 import { heroVaults, networkCopy, withdrawalCopy } from "@/lib/vaultCopy";
@@ -88,7 +89,7 @@ function toSheets(vaults: VaultInfo[]): Sheet[] {
 
 export async function HeroVaults() {
   const { vaults, asOf, live } = await listVaultsForDisplay();
-  return <Stack sheets={toSheets(vaults)} status={live ? "Live from IXS testnet" : asOfCopy(asOf)} />;
+  return <Stack sheets={toSheets(vaults)} status={live ? `Live from ${IXS_LABEL}` : asOfCopy(asOf)} />;
 }
 
 export function HeroVaultsLoading() {

@@ -1,5 +1,6 @@
 "use client";
 
+import { isMainnetChain } from "@/lib/network";
 import { WithdrawalReminder } from "@/components/WithdrawalReminder";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
@@ -239,7 +240,11 @@ export function MovesScreen() {
   const shortOfFunds = balance !== null && balance + 1e-9 < need;
   const MIN_GAS = 0.002;
   const noGas = gas !== null && gas < MIN_GAS;
-  const gasSymbol = moves[0]?.chainId === 97 ? "BNB" : "gas";
+  const gasSymbol = moves[0] ? ({ 97: "BNB", 56: "BNB", 43114: "AVAX" } as Record<number, string>)[moves[0].chainId] ?? "gas" : "gas";
+  // Mainnet is preview only: real transactions, built and checked, never signed from this build.
+  // Known from the plan before any wallet connects, so the lock and copy show from the first render.
+  const parkedVault = plan.vaults.find((v) => v.id === plan.plan.parked[0]?.vaultId);
+  const mainnet = moves[0] ? isMainnetChain(moves[0].chainId) : parkedVault ? isMainnetChain(parkedVault.chainId) : false;
   const allDone = moves.length > 0 && moves.every((m, mi) => m.steps.every((_, si) => ["done", "skipped"].includes(steps[`${mi}.${si}`]?.kind ?? "")));
 
   return (
@@ -253,7 +258,7 @@ export function MovesScreen() {
             </>
           ) : (
             <>
-              Sign to park <span className="tabular-nums">{formatUsdc(parkedTotal)}</span> USDC.
+              {mainnet ? "Mainnet preview: park " : "Sign to park "}<span className="tabular-nums">{formatUsdc(parkedTotal)}</span> USDC.
             </>
           )}
         </h1>
@@ -343,7 +348,7 @@ export function MovesScreen() {
             ))}
           </dl>
         )}
-        {account && moves[0] && !wrongChain && !shortOfFunds && !noGas && balance !== null && gas !== null && !allDone && (
+        {!mainnet && account && moves[0] && !wrongChain && !shortOfFunds && !noGas && balance !== null && gas !== null && !allDone && (
           <p className="flex items-center gap-2 text-[14px] text-ink">
             <span className="grid h-5 w-5 place-items-center rounded-[6px] bg-volt text-[12px]" aria-hidden="true">✓</span>
             All set. Approve, then deposit.
@@ -372,7 +377,13 @@ export function MovesScreen() {
         </div>
       )}
 
-      {shortOfFunds && !allDone && moves[0] && (
+      {mainnet && (
+        <p className="rounded-[12px] bg-cloud p-4 text-[15px] leading-[23px] text-ink" style={{ boxShadow: "inset 0 0 0 1px #d4d4d8" }}>
+          Mainnet preview. Ebbryn asks IXS to build the real transactions for its live {networkCopy((moves[0] ?? parkedVault)?.network ?? "bsc")} vault and checks them. Signing is turned off in this build, so nothing can be sent. IXS&apos;s minimum deposit is $100.
+        </p>
+      )}
+
+      {!mainnet && shortOfFunds && !allDone && moves[0] && (
         <p className="rounded-[12px] p-4 text-[15px] text-ink" style={{ boxShadow: "inset 0 0 0 1px #b3261e" }}>
           This wallet has {formatUsdc(balance!)} IXS test USDC on {networkCopy(moves[0].network)}. You need {formatUsdc(need)} USDC to complete this deposit.
           <span className="mt-2 block text-[13px] text-charcoal">
@@ -381,7 +392,7 @@ export function MovesScreen() {
         </p>
       )}
 
-      {noGas && !allDone && moves[0] && (
+      {!mainnet && noGas && !allDone && moves[0] && (
         <p className="-mt-4 rounded-[12px] bg-cloud px-4 py-3 text-[14px] text-charcoal">
           This wallet has {gas!.toFixed(4)} {gasSymbol} on {networkCopy(moves[0].network)}. It needs a little {gasSymbol} to pay network fees for both steps.
         </p>
@@ -405,7 +416,7 @@ export function MovesScreen() {
             {m.steps.map((s, si) => {
               const st = steps[`${mi}.${si}`] ?? { kind: "idle" };
               const prevOk = si === 0 || ["done", "skipped"].includes(steps[`${mi}.${si - 1}`]?.kind ?? "");
-              const canSign = account && !wrongChain && !shortOfFunds && !noGas && prevOk && ["idle", "error"].includes(st.kind);
+              const canSign = !mainnet && account && !wrongChain && !shortOfFunds && !noGas && prevOk && ["idle", "error"].includes(st.kind);
               const approve = s.type.includes("approve") ? decodeApprove(s.tx.data) : null;
               const exact = !!approve && approve.amount === BigInt(m.baseUnits);
               const addr = (a: string) => `${m.explorerUrl}/address/${a}`;
@@ -453,7 +464,7 @@ export function MovesScreen() {
                       </button>
                       {!canSign && st.kind === "idle" && (
                         <span className="text-[12px] text-slate">
-                          {!account ? "Connect a wallet first." : wrongChain ? "Switch networks first." : shortOfFunds ? "Not enough USDC." : noGas ? `Not enough ${gasSymbol} for gas.` : `Unlocks after step ${si} confirms.`}
+                          {mainnet ? "Signing is off on mainnet in this build." : !account ? "Connect a wallet first." : wrongChain ? "Switch networks first." : shortOfFunds ? "Not enough USDC." : noGas ? `Not enough ${gasSymbol} for gas.` : `Unlocks after step ${si} confirms.`}
                         </span>
                       )}
                     </div>

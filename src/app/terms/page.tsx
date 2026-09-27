@@ -6,7 +6,7 @@ import { REPO_URL } from "@/lib/site";
 
 export const metadata: Metadata = pageMeta({
   title: "Terms",
-  description: "The terms for using Ebbryn, a non-custodial testnet planner for USDC payouts.",
+  description: "The terms for using Ebbryn, a non-custodial planner for USDC payouts.",
   path: "/terms",
 });
 
@@ -15,7 +15,7 @@ const TOC = [
   { id: "service", label: "What Ebbryn is" },
   { id: "custody", label: "No custody" },
   { id: "advice", label: "No financial advice" },
-  { id: "testnet", label: "Testnet only" },
+  { id: "testnet", label: "Preview only" },
   { id: "responsibilities", label: "Your responsibilities" },
   { id: "third-parties", label: "Third-party services" },
   { id: "availability", label: "Availability and limits" },
@@ -30,7 +30,7 @@ export default function TermsPage() {
     <DocPage
       label="Terms"
       title="Terms of use"
-      intro={<p>The short version: Ebbryn is an unaudited testnet tool. It proposes plans, you decide and sign, and you use it at your own risk.</p>}
+      intro={<p>The short version: Ebbryn is an unaudited preview tool that can’t send real funds. It proposes plans, you decide and sign, and you use it at your own risk.</p>}
       updated="September 24, 2026"
       toc={TOC}
     >
@@ -56,9 +56,9 @@ export default function TermsPage() {
         Plans are generated from the rules and numbers you enter. They are not financial, investment, legal or tax advice, and Ebbryn has no fiduciary duty to you. Yields, withdrawal timing and vault availability are set by third parties and can change. Any figures on the site, including the idle cash calculator, are illustrations based on your own assumptions.
       </p>
 
-      <h2 id="testnet">Testnet only</h2>
+      <h2 id="testnet">Preview only</h2>
       <p>
-        Ebbryn works with testnet vaults and test tokens that have no real value. The code hasn’t been audited. Don’t use it with real funds or on mainnet. IXS’s mainnet vaults take real funds and are outside this build.
+        Ebbryn reads IXS’s live mainnet vaults and builds real transactions for review, but signing is turned off on mainnet, so it can’t move real funds. A testnet mode exists for development and uses test tokens with no value. The code hasn’t been audited. Don’t rely on it for real treasury decisions.
       </p>
 
       <h2 id="responsibilities">Your responsibilities</h2>

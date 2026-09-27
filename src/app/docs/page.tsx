@@ -143,22 +143,19 @@ export default function DocsPage() {
         <li>For each payout, set a name, an amount in USDC, a first date and how often it repeats: <strong>One time</strong>, <strong>Every day</strong>, or <strong>1st and 15th</strong>.</li>
         <li>You can add up to 20 payouts. Ebbryn plans the next 30 days.</li>
       </ol>
-      <h3>Connect a wallet on BSC testnet</h3>
+      <h3>Connect a wallet</h3>
       <ol>
         <li>Install a browser wallet such as <a href="https://metamask.io" target="_blank" rel="noreferrer">MetaMask</a>.</li>
-        <li>On Moves, click <strong>Connect wallet</strong>. Ebbryn asks your wallet to switch to BSC testnet (chain 97) and adds it if needed.</li>
-        <li>
-          Get a little test BNB for network fees from the <a href="https://www.bnbchain.org/en/testnet-faucet" target="_blank" rel="noreferrer">BNB Chain testnet faucet</a>.
-        </li>
-        <li>Sending a deposit needs IXS test USDC, which IXS doesn’t issue publicly. You can review the exact moves and connect a wallet, but not broadcast them on testnet.</li>
+        <li>On Moves, click <strong>Connect wallet</strong>. Ebbryn asks your wallet to switch to BSC and reads your USDC and BNB balances.</li>
+        <li>The live site is a mainnet preview: IXS builds the real transactions for its live BSC vault and Ebbryn checks them, but signing is turned off, so nothing can be sent. IXS’s minimum deposit is $100.</li>
       </ol>
-      <h3>Sign the moves</h3>
+      <h3>The moves</h3>
       <ol>
         <li>
           <strong>Approve USDC.</strong> This lets the vault take exactly the deposit amount. Skipped if your wallet already approved enough.
         </li>
         <li>
-          <strong>Deposit USDC.</strong> This parks the money in the IXS vault. Each transaction links to the block explorer once confirmed.
+          <strong>Deposit USDC.</strong> This parks the money in the IXS vault. In the mainnet preview both steps stay unsigned.
         </li>
       </ol>
 
@@ -194,11 +191,11 @@ export default function DocsPage() {
             </tr>
             <tr>
               <th>Vault</th>
-              <td>IXHYB - BSC on BSC testnet (chain 97). Withdraw anytime.</td>
+              <td>IXHYB - BSC on BSC mainnet (chain 56), read live from IXS. Withdraw anytime.</td>
             </tr>
             <tr>
               <th>Network</th>
-              <td>Testnet only. IXS mainnet vaults take real USDC, from $100 per IXS.</td>
+              <td>Mainnet preview: real vaults and real transactions, signing turned off. A testnet mode against IXS’s dev environment is available for development.</td>
             </tr>
             <tr>
               <th>Your data</th>
@@ -270,7 +267,7 @@ export default function DocsPage() {
             </tr>
             <tr>
               <td>“IXS didn’t answer in time…”</td>
-              <td>The IXS testnet API was slow. Wait a minute and try again.</td>
+              <td>The IXS API was slow. Wait a minute and try again.</td>
             </tr>
             <tr>
               <td>The plan didn’t pass</td>
@@ -294,7 +291,7 @@ export default function DocsPage() {
       <h3>Is this financial advice?</h3>
       <p>No. Ebbryn turns the rules you set into a proposed schedule. You decide whether to sign anything.</p>
       <h3>Can I use real funds?</h3>
-      <p>No. Ebbryn is a testnet build for the OpenServ SERV Hackathon and hasn’t been audited.</p>
+      <p>No. Ebbryn is a hackathon build and hasn’t been audited. It reads real IXS mainnet vaults but never lets anyone sign on mainnet.</p>
       <h3>Why does planning take up to two minutes?</h3>
       <p>SERV reasons over your rules and a second agent reviews the draft before it’s returned. If a request stalls, Ebbryn sends a second one and uses whichever finishes first.</p>
       <h3>What if SERV makes a mistake?</h3>

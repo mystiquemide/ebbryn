@@ -1,5 +1,6 @@
 "use client";
 
+import { isMainnetChain } from "./network";
 import { createPublicClient, createWalletClient, custom, decodeFunctionData, erc20Abi, formatUnits, http, type EIP1193Provider } from "viem";
 import { chainById } from "./chains";
 
@@ -85,6 +86,8 @@ export async function sendAndConfirm(
   tx: { to: `0x${string}`; data: `0x${string}`; value?: string },
   onSent: (hash: `0x${string}`) => void,
 ): Promise<TxOutcome> {
+  // Hard stop: this build never signs on a chain holding real funds, whatever the UI shows.
+  if (isMainnetChain(chainId)) throw new WalletError("Signing is turned off on mainnet in this build.");
   const chain = chainById(chainId);
   if (!window.ethereum || !chain) throw new WalletError("No browser wallet found.");
   const wallet = createWalletClient({ chain, transport: custom(window.ethereum) });
