@@ -46,6 +46,20 @@ Planning uses shared SERV credits, so it's limited to 5 plans per IP every 10 mi
 ## How it works
 
 ```mermaid
+flowchart LR
+    U["Browser<br/>setup, plan, moves pages"] -- balance, payouts, rules --> API["Next.js API<br/>/api/plan, /api/moves, /api/vaults"]
+    API -- plan request --> SERV[SERV Reasoning<br/>Kronos + Multipath]
+    API -- vault list --> REST[IXS REST API]
+    API -- vault details, build txs --> MCP[IXS MCP]
+    API --> CHK["8 checks + HMAC seal<br/>check.ts, sign.ts"]
+    API -- unsigned approve + deposit --> U
+    U -- signs in testnet mode --> W[Your wallet]
+    W --> BSC[IXS vault on BSC]
+```
+
+One plan, step by step:
+
+```mermaid
 sequenceDiagram
     actor You
     participant App as Ebbryn server
