@@ -147,7 +147,7 @@ export default function DocsPage() {
       <ol>
         <li>Install a browser wallet such as <a href="https://metamask.io" target="_blank" rel="noreferrer">MetaMask</a>.</li>
         <li>On Moves, click <strong>Connect wallet</strong>. Ebbryn asks your wallet to switch to BSC and reads your USDC and BNB balances.</li>
-        <li>The live site is a mainnet preview: IXS builds the real transactions for its live BSC vault and Ebbryn checks them, but signing is turned off, so nothing can be sent. IXS’s minimum deposit is $100.</li>
+        <li>The live site is a mainnet preview: IXS builds the real transactions for its live BSC vault and Ebbryn checks them. Signing is locked on this public demo so no one’s real money moves by accident. IXS’s minimum deposit is $100.</li>
       </ol>
       <h3>The moves</h3>
       <ol>
@@ -155,7 +155,7 @@ export default function DocsPage() {
           <strong>Approve USDC.</strong> This lets the vault take exactly the deposit amount. Skipped if your wallet already approved enough.
         </li>
         <li>
-          <strong>Deposit USDC.</strong> This parks the money in the IXS vault. In the mainnet preview both steps stay unsigned.
+          <strong>Deposit USDC.</strong> This parks the money in the IXS vault. On the public demo both steps are shown but locked.
         </li>
       </ol>
 
@@ -195,7 +195,7 @@ export default function DocsPage() {
             </tr>
             <tr>
               <th>Network</th>
-              <td>Mainnet preview: real vaults and real transactions, signing turned off. A testnet mode against IXS’s dev environment is available for development.</td>
+              <td>Mainnet preview: real vaults and real transactions, with signing locked on the public demo. A testnet mode against IXS’s dev environment is available for development.</td>
             </tr>
             <tr>
               <th>Your data</th>
@@ -291,7 +291,7 @@ export default function DocsPage() {
       <h3>Is this financial advice?</h3>
       <p>No. Ebbryn turns the rules you set into a proposed schedule. You decide whether to sign anything.</p>
       <h3>Can I use real funds?</h3>
-      <p>No. Ebbryn is a hackathon build and hasn’t been audited. It reads real IXS mainnet vaults but never lets anyone sign on mainnet.</p>
+      <p>No. Ebbryn is a hackathon build and hasn’t been audited. It reads real IXS mainnet vaults, and signing is locked on the public demo so no one’s funds move by accident.</p>
       <h3>Why does planning take up to two minutes?</h3>
       <p>SERV reasons over your rules and a second agent reviews the draft before it’s returned. If a request stalls, Ebbryn sends a second one and uses whichever finishes first.</p>
       <h3>What if SERV makes a mistake?</h3>

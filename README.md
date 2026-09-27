@@ -6,7 +6,7 @@
 [![IXS vault on BSC mainnet](https://img.shields.io/badge/BSC%20mainnet-IXS%20vault-F0B90B)](https://bscscan.com/address/0xc975a3EeF2e49F8eDdEf585340C43f15300fCB82)
 [![SERV Hackathon](https://img.shields.io/badge/built%20for-SERV%20Hackathon%20Ed.01-18181b)](https://www.openserv.ai/hackathon)
 
-**Cash that comes back on time.** Ebbryn plans how much of a business's payroll USDC to park in IXS RWA vaults and when to bring it back before each payout. SERV plans it, code checks it, IXS builds the real mainnet transactions, and only your own wallet could ever sign them. The live site is a mainnet preview with signing turned off.
+**Cash that comes back on time.** Ebbryn plans how much of a business's payroll USDC to park in IXS RWA vaults and when to bring it back before each payout. SERV plans it, code checks it, IXS builds the real mainnet transactions, and only your own wallet could ever sign them. The live site is a public mainnet demo with signing locked, so no one's real money moves by accident.
 
 Built for the OpenServ SERV Hackathon, Edition 01, Open Track.
 
@@ -65,7 +65,7 @@ sequenceDiagram
     App->>IXS: Build unsigned approve and deposit
     IXS-->>App: Transactions
     App->>App: Verify contract and approve amount
-    App-->>You: Exact mainnet transactions, signing turned off
+    App-->>You: Exact mainnet transactions, signing locked on the demo
     Note over You,Chain: Testnet mode: you sign and send from your own wallet
 ```
 
@@ -76,7 +76,7 @@ sequenceDiagram
 | Check | Code | Eight deterministic checks. A failing plan goes back to SERV once with the failures. If it still fails, moves stay locked |
 | Seal | Code | A passing plan is HMAC-signed so it can't be edited in the browser before moves are built |
 | Build | IXS | IXS MCP returns unsigned approve and deposit transactions. Ebbryn rejects any transaction aimed at an unexpected contract and checks the approve amount matches the deposit |
-| Sign | You | Only your wallet can sign. On the live mainnet preview signing is off; in testnet mode you sign each move, including later withdrawals |
+| Sign | You | Only your wallet can sign. On the public mainnet demo signing is locked; in testnet mode you sign each move, including later withdrawals |
 
 The rule of the design: judgment goes to the model, arithmetic goes to code. SERV weighs competing goals like your buffer rules, payout dates and withdrawal lag. Code owns every sum, date and limit.
 
@@ -98,7 +98,7 @@ API notes from building: a system message is required, `temperature` isn't suppo
 
 ### IXS Finance
 
-The live site runs a **mainnet preview**: Ebbryn reads IXS's production API and real vaults, plans against them, and has IXS build the real mainnet transactions. Signing is turned off on mainnet in code ([`src/lib/wallet.ts`](src/lib/wallet.ts) refuses chain 56 and 43114), so nothing can move real funds. Set `IXS_NETWORK=testnet` to run against IXS's dev environment instead.
+The live site runs a **mainnet preview**: Ebbryn reads IXS's production API and real vaults, plans against them, and has IXS build the real mainnet transactions. Signing on mainnet is locked in code ([`src/lib/wallet.ts`](src/lib/wallet.ts) refuses chain 56 and 43114), so nothing can move real funds. Set `IXS_NETWORK=testnet` to run against IXS's dev environment instead.
 
 | What | Detail |
 |---|---|
@@ -152,7 +152,7 @@ First customers: non-US companies paying 10 to 50 contractors in USDC, and opera
 
 ## Limitations
 
-- Hackathon code, unaudited. Mainnet is preview only: real vaults and real transactions, signing turned off.
+- Hackathon code, unaudited. Mainnet is a public demo: real vaults and real transactions, with signing locked.
 - No deposit has been broadcast. IXS's minimum is $100 of real USDC and its testnet has no public test USDC (see [IXS Finance](#ixs-finance)).
 - Withdrawals are planned, not automated. You come back on the date and sign, with an "Add to calendar" reminder.
 - Setup and plans are stored in your browser. There are no accounts.
@@ -174,7 +174,7 @@ npm run dev                  # http://localhost:3000
 | `SERV_API_KEY` | Yes | SERV Reasoning API key |
 | `PLAN_SIGNING_SECRET` | Yes | 32+ characters, signs passing plans |
 | `SERV_MODEL` | No | Defaults to `gpt-6-luna-serv-kronos-multipath` |
-| `IXS_NETWORK` | No | `mainnet` (preview, signing off) or `testnet` (IXS dev environment). Defaults to `testnet` |
+| `IXS_NETWORK` | No | `mainnet` (public demo, signing locked) or `testnet` (IXS dev environment). Defaults to `testnet` |
 | `IXS_MCP_URL` | No | Testnet MCP override. Mainnet uses `api-v2.ixs.finance/mcp` |
 | `NEXT_PUBLIC_BSC_RPC`, `NEXT_PUBLIC_BSC_TESTNET_RPC` | No | RPCs for balance and allowance reads |
 | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | No | Upstash Redis for shared rate limits. Falls back to in-memory |

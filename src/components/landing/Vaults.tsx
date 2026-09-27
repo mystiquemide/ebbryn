@@ -5,7 +5,7 @@ import type { VaultInfo } from "@/lib/plan";
 import { asOfCopy, networkCopy, withdrawalCopy } from "@/lib/vaultCopy";
 
 const PREVIEW_NOTE =
-  IXS_NETWORK === "mainnet" ? "Real vaults: transactions are built and checked, never signed here." : "Testnet vaults: deposits are built and checked, not sent.";
+  IXS_NETWORK === "mainnet" ? "Real vaults: transactions are built and checked. Signing is locked on this public demo." : "Testnet vaults: deposits are built and checked, not sent.";
 
 function Deposits({ v }: { v: VaultInfo }) {
   return (

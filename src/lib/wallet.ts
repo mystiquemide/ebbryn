@@ -87,7 +87,7 @@ export async function sendAndConfirm(
   onSent: (hash: `0x${string}`) => void,
 ): Promise<TxOutcome> {
   // Hard stop: this build never signs on a chain holding real funds, whatever the UI shows.
-  if (isMainnetChain(chainId)) throw new WalletError("Signing is turned off on mainnet in this build.");
+  if (isMainnetChain(chainId)) throw new WalletError("Signing is locked on this public demo so no one's real money moves by accident.");
   const chain = chainById(chainId);
   if (!window.ethereum || !chain) throw new WalletError("No browser wallet found.");
   const wallet = createWalletClient({ chain, transport: custom(window.ethereum) });

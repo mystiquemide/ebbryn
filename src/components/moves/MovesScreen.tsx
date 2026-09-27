@@ -379,7 +379,7 @@ export function MovesScreen() {
 
       {mainnet && (
         <p className="rounded-[12px] bg-cloud p-4 text-[15px] leading-[23px] text-ink" style={{ boxShadow: "inset 0 0 0 1px #d4d4d8" }}>
-          Mainnet preview. Ebbryn asks IXS to build the real transactions for its live {networkCopy((moves[0] ?? parkedVault)?.network ?? "bsc")} vault and checks them. Signing is turned off in this build, so nothing can be sent. IXS&apos;s minimum deposit is $100.
+          Mainnet preview. Ebbryn asks IXS to build the real transactions for its live {networkCopy((moves[0] ?? parkedVault)?.network ?? "bsc")} vault and checks them. Signing is locked on this public demo so no one&apos;s real money moves by accident. In your own setup, you sign from your wallet. IXS&apos;s minimum deposit is $100.
         </p>
       )}
 
@@ -464,7 +464,7 @@ export function MovesScreen() {
                       </button>
                       {!canSign && st.kind === "idle" && (
                         <span className="text-[12px] text-slate">
-                          {mainnet ? "Signing is off on mainnet in this build." : !account ? "Connect a wallet first." : wrongChain ? "Switch networks first." : shortOfFunds ? "Not enough USDC." : noGas ? `Not enough ${gasSymbol} for gas.` : `Unlocks after step ${si} confirms.`}
+                          {mainnet ? "Signing is locked on this public demo." : !account ? "Connect a wallet first." : wrongChain ? "Switch networks first." : shortOfFunds ? "Not enough USDC." : noGas ? `Not enough ${gasSymbol} for gas.` : `Unlocks after step ${si} confirms.`}
                         </span>
                       )}
                     </div>

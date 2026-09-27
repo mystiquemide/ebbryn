@@ -15,7 +15,7 @@ const TOC = [
   { id: "service", label: "What Ebbryn is" },
   { id: "custody", label: "No custody" },
   { id: "advice", label: "No financial advice" },
-  { id: "testnet", label: "Preview only" },
+  { id: "testnet", label: "Public demo" },
   { id: "responsibilities", label: "Your responsibilities" },
   { id: "third-parties", label: "Third-party services" },
   { id: "availability", label: "Availability and limits" },
@@ -56,9 +56,9 @@ export default function TermsPage() {
         Plans are generated from the rules and numbers you enter. They are not financial, investment, legal or tax advice, and Ebbryn has no fiduciary duty to you. Yields, withdrawal timing and vault availability are set by third parties and can change. Any figures on the site, including the idle cash calculator, are illustrations based on your own assumptions.
       </p>
 
-      <h2 id="testnet">Preview only</h2>
+      <h2 id="testnet">Public demo</h2>
       <p>
-        Ebbryn reads IXS’s live mainnet vaults and builds real transactions for review, but signing is turned off on mainnet, so it can’t move real funds. A testnet mode exists for development and uses test tokens with no value. The code hasn’t been audited. Don’t rely on it for real treasury decisions.
+        Ebbryn reads IXS’s live mainnet vaults and builds real transactions for review, but signing on mainnet is locked on this public demo, so no one’s real funds can move by accident. A testnet mode exists for development and uses test tokens with no value. The code hasn’t been audited. Don’t rely on it for real treasury decisions.
       </p>
 
       <h2 id="responsibilities">Your responsibilities</h2>
