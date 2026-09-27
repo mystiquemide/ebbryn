@@ -5,7 +5,7 @@ import { SiteNav } from "./SiteNav";
 export type TocItem = { id: string; label: string };
 
 // Shared shell for long-form pages: title block, sticky contents on desktop, readable column.
-export function DocPage({ label, title, intro, updated, toc, children }: { label: string; title: string; intro: ReactNode; updated?: string; toc: TocItem[]; children: ReactNode }) {
+export function DocPage({ label, title, intro, updated, toc, children, footer = true }: { label: string; title: string; intro: ReactNode; updated?: string; toc: TocItem[]; children: ReactNode; footer?: boolean }) {
   return (
     <>
       <SiteNav />
@@ -33,7 +33,7 @@ export function DocPage({ label, title, intro, updated, toc, children }: { label
           </div>
         </div>
       </main>
-      <SiteFooter />
+      {footer && <SiteFooter />}
     </>
   );
 }

@@ -32,6 +32,7 @@ export default function DocsPage() {
       title="Using Ebbryn"
       intro={<p>Everything you need to plan your USDC payouts, understand why a plan passes or fails, and sign the moves from your own wallet.</p>}
       toc={TOC}
+      footer={false}
     >
       <h2 id="quickstart">Quickstart</h2>
       <p>Your first plan takes a few minutes and needs no wallet.</p>
