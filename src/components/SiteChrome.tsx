@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { REPO_URL } from "@/lib/site";
+import { GitHubMark } from "./GitHubMark";
 import { Wordmark } from "./TideMark";
 
 export function SiteFooter() {
@@ -9,6 +10,17 @@ export function SiteFooter() {
         <div className="flex flex-col gap-3">
           <Wordmark />
           <p className="text-slate">Cash that comes back on time.</p>
+          {REPO_URL && (
+            <a
+              href={REPO_URL}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Ebbryn on GitHub"
+              className="-ml-2 inline-flex h-11 w-11 items-center justify-center rounded-[10px] text-charcoal transition-colors hover:bg-cloud hover:text-ink"
+            >
+              <GitHubMark size={22} />
+            </a>
+          )}
         </div>
         <div className="flex flex-col gap-1 md:gap-3">
           <p className="label">Product</p>
@@ -29,11 +41,6 @@ export function SiteFooter() {
           <a href="https://www.ixs.finance/vaults" target="_blank" rel="noreferrer" className="inline-flex min-h-[44px] items-center text-charcoal hover:text-ink md:min-h-0">
             IXS vaults
           </a>
-          {REPO_URL && (
-            <a href={REPO_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-[44px] items-center text-charcoal hover:text-ink md:min-h-0">
-              GitHub
-            </a>
-          )}
         </div>
       </div>
       <div className="border-t border-steel">
