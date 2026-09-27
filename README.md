@@ -6,7 +6,7 @@
 [![IXS vault on BSC mainnet](https://img.shields.io/badge/BSC%20mainnet-IXS%20vault-F0B90B)](https://bscscan.com/address/0xc975a3EeF2e49F8eDdEf585340C43f15300fCB82)
 [![SERV Hackathon](https://img.shields.io/badge/built%20for-SERV%20Hackathon%20Ed.01-18181b)](https://www.openserv.ai/hackathon)
 
-**Cash that comes back on time.** Ebbryn plans how much of a business's payroll USDC to park in IXS RWA vaults and when to bring it back before each payout. SERV plans it, code checks it, IXS builds the transactions, and you sign every move.
+**Cash that comes back on time.** Ebbryn plans how much of a business's payroll USDC to park in IXS RWA vaults and when to bring it back before each payout. SERV plans it, code checks it, IXS builds the real mainnet transactions, and only your own wallet could ever sign them. The live site is a mainnet preview with signing turned off.
 
 Built for the OpenServ SERV Hackathon, Edition 01, Open Track.
 
@@ -65,8 +65,8 @@ sequenceDiagram
     App->>IXS: Build unsigned approve and deposit
     IXS-->>App: Transactions
     App->>App: Verify contract and approve amount
-    App-->>You: Exact transactions to sign
-    You->>Chain: Sign and send (testnet mode only)
+    App-->>You: Exact mainnet transactions, signing turned off
+    Note over You,Chain: Testnet mode: you sign and send from your own wallet
 ```
 
 | Step | Who decides | What happens |
@@ -76,7 +76,7 @@ sequenceDiagram
 | Check | Code | Eight deterministic checks. A failing plan goes back to SERV once with the failures. If it still fails, moves stay locked |
 | Seal | Code | A passing plan is HMAC-signed so it can't be edited in the browser before moves are built |
 | Build | IXS | IXS MCP returns unsigned approve and deposit transactions. Ebbryn rejects any transaction aimed at an unexpected contract and checks the approve amount matches the deposit |
-| Sign | You | You sign every transaction, including each later withdrawal |
+| Sign | You | Only your wallet can sign. On the live mainnet preview signing is off; in testnet mode you sign each move, including later withdrawals |
 
 The rule of the design: judgment goes to the model, arithmetic goes to code. SERV weighs competing goals like your buffer rules, payout dates and withdrawal lag. Code owns every sum, date and limit.
 
@@ -132,7 +132,7 @@ Every plan runs through [`src/lib/check.ts`](src/lib/check.ts). One failure lock
 | Case | Result | Evidence |
 |---|---|---|
 | SERV counts the same payroll twice | Rejected by `COVER_ONCE` and `LIQUID_COVER`, moves locked | [`serv-double-count.json`](src/fixtures/serv-double-count.json), [`check.test.ts`](src/lib/check.test.ts) |
-| Payroll plan on the live URL | 8 of 8 on the first attempt: 81,600 ready, 46,801 parked, 42,000 withdrawn Oct 14 for the Oct 15 payroll | SERV request `4e20751a-7866-4b12-ac69-4fa3eec5aca8` |
+| Payroll plan on the live URL (testnet run, Sep 24) | 8 of 8 on the first attempt: 81,600 ready, 46,801 parked, 42,000 withdrawn Oct 14 for the Oct 15 payroll | SERV request `4e20751a-7866-4b12-ac69-4fa3eec5aca8` |
 | Rules text says "park 100%" | `CAP` fails, hard limits win | [`check.test.ts`](src/lib/check.test.ts) |
 | Real mainnet transactions | IXS built an exact USDC approve and a deposit into the live BSC vault `0xc975…fCB82`; the Moves screen keeps both unsigned | [`src/lib/network.ts`](src/lib/network.ts), [`network.test.ts`](src/lib/network.test.ts) |
 | Plan edited in the browser | `/api/moves` returns 400, nothing built | [`guard.test.ts`](src/lib/guard.test.ts) |
@@ -142,7 +142,7 @@ Every plan runs through [`src/lib/check.ts`](src/lib/check.ts). One failure lock
 
 Lint, typecheck, 39 tests and a production build run on every push in [CI](.github/workflows/ci.yml).
 
-![Moves screen with the exact deposit and a withdrawal reminder](.github/assets/moves.png)
+![Mainnet preview: the real IXS approve and deposit for the live BSC vault, with signing turned off](.github/assets/moves.png)
 
 ## Business model
 
