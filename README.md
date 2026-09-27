@@ -12,7 +12,7 @@ Built for the OpenServ SERV Hackathon, Edition 01, Open Track.
 
 [Live app](https://ebbryn.midelabs.xyz/?via=gh) · [Plan my cash](https://ebbryn.midelabs.xyz/setup?via=gh) · [Rejected plan](https://ebbryn.midelabs.xyz/plan?case=recorded&via=gh) · [Docs](https://ebbryn.midelabs.xyz/docs?via=gh) · [Live vaults API](https://ebbryn.midelabs.xyz/api/vaults) · [IXS integration notes](https://github.com/IXS-Finance/ixs-rwa-agent-skills/issues/5)
 
-[![Watch the Ebbryn demo (2:38)](.github/assets/demo-thumbnail.jpg)](https://youtu.be/ZeZf_biVHnE)
+[![Watch the Ebbryn demo (2:44)](.github/assets/demo-thumbnail.jpg)](https://youtu.be/hbwIH4dpq4A)
 
 ## The problem
 
